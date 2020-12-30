@@ -1,7 +1,6 @@
 .idea/
 external_libraries/
 cmake-build-debug/CmakeFiles
-external_libraries/
 LIB/
 Testing/
 CMakeCache.txt
