@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="GLAD"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\LIB\;CMake Files\LIB\glad\;CMake Files\LIB\glfw\;CMake Files\LIB\glfw\CMake\;CMake Files\LIB\glfw\src\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/kail/Рабочий стол/OpenGL/cmake-build-debug/LIB/glad"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GLAD">
+				<Option output="/home/kail/Рабочий стол/OpenGL/cmake-build-debug/LIB/glad/libGLAD.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/kail/Рабочий стол/OpenGL/cmake-build-debug/LIB/glad"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/kail/Рабочий стол/OpenGL/LIB/glad/include"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 GLAD"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GLAD/fast">
+				<Option output="/home/kail/Рабочий стол/OpenGL/cmake-build-debug/LIB/glad/libGLAD.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/kail/Рабочий стол/OpenGL/cmake-build-debug/LIB/glad"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/kail/Рабочий стол/OpenGL/LIB/glad/include"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 GLAD/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/OpenGL/cmake-build-debug/LIB/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/LIB/glad/include/glad/glad.h">
+			<Option target="GLAD"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/LIB/glad/src/glad.c">
+			<Option target="GLAD"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/LIB/glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\LIB\glad\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/LIB/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\LIB\glfw\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/LIB/glfw/CMake/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\LIB\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/LIB/glfw/CMake/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\LIB\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/LIB/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\LIB\glfw\src\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/LIB/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\LIB\glfw\src\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

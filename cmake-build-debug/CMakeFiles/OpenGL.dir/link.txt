@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/OpenGL.dir/main.cpp.o CMakeFiles/OpenGL.dir/support/ResourcesManager.cpp.o CMakeFiles/OpenGL.dir/game/ILoop.cpp.o CMakeFiles/OpenGL.dir/game/Game.cpp.o  -o OpenGL  external_libraries/glfw/src/libglfw3.a external_libraries/glad/libglad.a -lpthread /usr/lib/x86_64-linux-gnu/librt.so -lm -ldl 
