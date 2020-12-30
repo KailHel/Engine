@@ -44,9 +44,10 @@ namespace SK {
                         0, 1, 3,  // First Triangle
                         1, 2, 3   // Second Triangle
                 };
-                GLuint VBO, VAO, EBO,VBO_COLOR,VBO_TEXTURE ,texture;
+                GLuint VBO, VAO, EBO,VBO_TEXTURE ;
                 glGenVertexArrays(1, &VAO);
-                glGenBuffers(1,&VBO_COLOR);
+                //glGenBuffers(1,&VBO_COLOR);
+                glGenBuffers(1, &VBO_TEXTURE);
                 glGenBuffers(1, &VBO);
                 glGenBuffers(1, &EBO);
 
@@ -72,7 +73,7 @@ namespace SK {
                 vao = VAO;
                 vbo = VBO;
                 ebo = EBO;
-                tex = texture;
+             
 
             }
             ~Sprite() {
