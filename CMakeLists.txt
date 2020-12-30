@@ -5,7 +5,7 @@
                                                                 project(OpenGL)
 
 
-                                   add_executable(OpenGL main.cpp
+                                                        add_executable(OpenGL main.cpp
                                            external_libraries/stbi/stb_image.h
                                            support/ResourcesManager.cpp support/ResourcesManager.h
                                            game/ILoop.h game/ILoop.cpp
