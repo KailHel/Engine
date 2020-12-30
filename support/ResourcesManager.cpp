@@ -52,6 +52,8 @@ void defWindowKeyCallback(GLFWwindow* window ,int key ,int scan,int action,int m
         ResourcesManager::_shMap ResourcesManager::_ShaderMap      =                _ShaderMapInit();
         ResourcesManager::_stMap ResourcesManager::_TextureMap     =                _TextureMapInit();
 
+        string ResourcesManager::_defaultPath                      =                "";
+
 
         //----------------------------------------------------------------------//
 //------------------------------------------------------------------------------------------------------------------------------------------------//

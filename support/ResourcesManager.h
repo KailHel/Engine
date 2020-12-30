@@ -76,7 +76,7 @@ public:
     //---SUPPORT---
     static string FileToString(const string &path) {
         std::ifstream f;
-        f.open(path.c_str() ,std::ios::in | std::ios::binary);
+        f.open(_defaultPath + "\\" + path.c_str() ,std::ios::in | std::ios::binary);
         if (!f.is_open()){
             cout << "WARNING :file not found - " << path << "\n";
         }
@@ -89,9 +89,13 @@ public:
     }
 
 
-
-
-
+private:
+    static string _defaultPath;
+public:
+    static void setDefaultPath(const string& Path) {
+        size_t found = Path.find_last_of("/\\");
+        _defaultPath = Path.substr(0, found);
+    }
 
     //################################################################################################################################
     //---------SHADER---------
