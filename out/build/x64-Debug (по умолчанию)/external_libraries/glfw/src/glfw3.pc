@@ -1,0 +1,13 @@
+prefix=C:/Users/kaiii/Source/Repos/Engine/out/install/x64-Debug (по умолчанию)
+exec_prefix=${prefix}
+includedir=C:/Users/kaiii/Source/Repos/Engine/out/install/x64-Debug (по умолчанию)/include
+libdir=C:/Users/kaiii/Source/Repos/Engine/out/install/x64-Debug (по умолчанию)/lib
+
+Name: GLFW
+Description: A multi-platform library for OpenGL, window and input
+Version: 3.4.0
+URL: https://www.glfw.org/
+Requires.private: 
+Libs: -L${libdir} -lglfw3
+Libs.private:  -lgdi32
+Cflags: -I${includedir}

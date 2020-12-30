@@ -1,14 +1,11 @@
-#version 330
-in vec2 texCoords;
-out vec4 frag_color;
+#version 330 core
+in vec2 TexCoord;
 
-uniform sampler2D tex;
+out vec4 color;
+
+uniform sampler2D ourTexture;
 
 void main()
 {
-     frag_color = texture(tex, texCoords);
-     if (frag_color.rgb == vec3(0.0))
-     {
-          discard;
-     }
+     color =  texture(ourTexture, TexCoord);
 }

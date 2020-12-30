@@ -1,0 +1,11 @@
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/CMakeFiles/OpenGL.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/CMakeFiles/edit_cache.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/CMakeFiles/rebuild_cache.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/external_libraries/glfw/CMakeFiles/edit_cache.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/external_libraries/glfw/CMakeFiles/rebuild_cache.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/external_libraries/glfw/src/CMakeFiles/rebuild_cache.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/external_libraries/glfw/src/CMakeFiles/glfw.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/external_libraries/glfw/src/CMakeFiles/edit_cache.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/external_libraries/glad/CMakeFiles/glad.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/external_libraries/glad/CMakeFiles/edit_cache.dir
+C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/external_libraries/glad/CMakeFiles/rebuild_cache.dir

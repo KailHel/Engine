@@ -18,7 +18,7 @@ void Game::Init()
     glClearColor(1,1,0,0);
 
 
-    s = new SK::Render::Sprite(defaultShaderName,"def",glm::vec2(400,300),glm::vec2(16,16),0);
+    s = new SK::Render::Sprite(defaultShaderName,"def",glm::vec2(0,0),glm::vec2(800,600),0);
 
     //------------------------
     glm::mat4 view(1.f);
