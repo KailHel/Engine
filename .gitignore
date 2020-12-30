@@ -1,8 +1,0 @@
-.idea/
-external_libraries/
-cmake-build-debug/CmakeFiles
-LIB/
-Testing/
-CMakeCache.txt
-cmake_install.cmake
-OpenGL.cbp
