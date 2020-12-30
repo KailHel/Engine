@@ -7,7 +7,7 @@
 
 #include "glad/glad.h"
 #include "string"
-#include "../external_libraries/stbImage/stb_image.h"
+#include "../external_libraries/stbi//stb_image.h"
 
 #include "../support//ResourcesManager.h"
 namespace SK {

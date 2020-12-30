@@ -6,5 +6,5 @@ CXX_FLAGS = -g
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I"/home/kail/Рабочий стол/OpenGL/external_libraries/glm-master" -I"/home/kail/Рабочий стол/OpenGL/external_libraries/glfw/include" -I"/home/kail/Рабочий стол/OpenGL/external_libraries/glad/include" 
+CXX_INCLUDES = -I"/home/kail/Рабочий стол/OpenGL/external_libraries/glm" -I"/home/kail/Рабочий стол/OpenGL/external_libraries/glfw/include" -I"/home/kail/Рабочий стол/OpenGL/external_libraries/glad/include" 
 

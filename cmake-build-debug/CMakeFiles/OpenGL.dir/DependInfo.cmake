@@ -13,7 +13,7 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../external_libraries/glm-master"
+  "../external_libraries/glm"
   "../external_libraries/glfw/include"
   "../external_libraries/glad/include"
   )

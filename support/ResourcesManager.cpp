@@ -8,7 +8,7 @@
 #include "../graphics/Texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../external_libraries//stbImage/stb_image.h"
+#include "../external_libraries//stbi/stb_image.h"
 
 //################################################################################################################################
 //---CallbackWindowProcedure

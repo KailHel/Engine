@@ -44,7 +44,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/kail/Рабочий стол/OpenGL/external_libraries/glm-master"/>
+					<Add directory="/home/kail/Рабочий стол/OpenGL/external_libraries/glm"/>
 					<Add directory="/home/kail/Рабочий стол/OpenGL/external_libraries/glfw/include"/>
 					<Add directory="/home/kail/Рабочий стол/OpenGL/external_libraries/glad/include"/>
 					<Add directory="/usr/include/c++/9"/>
@@ -69,7 +69,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/kail/Рабочий стол/OpenGL/external_libraries/glm-master"/>
+					<Add directory="/home/kail/Рабочий стол/OpenGL/external_libraries/glm"/>
 					<Add directory="/home/kail/Рабочий стол/OpenGL/external_libraries/glfw/include"/>
 					<Add directory="/home/kail/Рабочий стол/OpenGL/external_libraries/glad/include"/>
 					<Add directory="/usr/include/c++/9"/>
@@ -279,7 +279,7 @@
 		<Unit filename="/home/kail/Рабочий стол/OpenGL/external_libraries/glfw/src/xkb_unicode.h">
 			<Option target="glfw"/>
 		</Unit>
-		<Unit filename="/home/kail/Рабочий стол/OpenGL/external_libraries/stbImage/stb_image.h">
+		<Unit filename="/home/kail/Рабочий стол/OpenGL/external_libraries/stbi/stb_image.h">
 			<Option target="OpenGL"/>
 		</Unit>
 		<Unit filename="/home/kail/Рабочий стол/OpenGL/game/Game.cpp">
