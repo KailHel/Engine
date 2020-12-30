@@ -1,3 +1,4 @@
 .vs/
 out/
 cmake-build-debug/
+cmake-build-debug/LIB/glad/CMakeFiles/GLAD.dir/depend.make
