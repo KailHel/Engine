@@ -14,7 +14,8 @@
                                            graphics/Sprite.h
                                            game/Game.cpp
                                            game/Game.h
-                                           graphics/Camera.h)
+                                           graphics/Camera.h
+                                           graphics/Camera.cpp)
 #----------------------------------------------------------------GLFW COMPILE OPTION--------------------------------------------------------------#
                                             set(GLFW_BUILD_EXAMPLES OFF     CACHE BOOL      "" FORCE)
                                             set(GLFW_BUILD_TESTS    OFF     CACHE BOOL      "" FORCE)

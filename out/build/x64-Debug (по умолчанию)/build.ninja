@@ -75,6 +75,14 @@ build CMakeFiles\OpenGL.dir\game\Game.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\
   TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
   TARGET_PDB = OpenGL.pdb
 
+build CMakeFiles\OpenGL.dir\graphics\Camera.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\..\graphics\Camera.cpp || cmake_object_order_depends_target_OpenGL_Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
+  INCLUDES = -I..\..\..\external_libraries\glm -I..\..\..\external_libraries\glfw\include -I..\..\..\external_libraries\glad\include
+  OBJECT_DIR = CMakeFiles\OpenGL.dir
+  OBJECT_FILE_DIR = CMakeFiles\OpenGL.dir\graphics
+  TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
+  TARGET_PDB = OpenGL.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target OpenGL
@@ -83,7 +91,7 @@ build CMakeFiles\OpenGL.dir\game\Game.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\
 #############################################
 # Link the executable OpenGL.exe
 
-build OpenGL.exe: CXX_EXECUTABLE_LINKER__OpenGL_Debug CMakeFiles\OpenGL.dir\main.cpp.obj CMakeFiles\OpenGL.dir\support\ResourcesManager.cpp.obj CMakeFiles\OpenGL.dir\game\ILoop.cpp.obj CMakeFiles\OpenGL.dir\game\Game.cpp.obj | external_libraries\glfw\src\glfw3.lib external_libraries\glad\glad.lib || external_libraries\glad\glad.lib external_libraries\glfw\src\glfw3.lib
+build OpenGL.exe: CXX_EXECUTABLE_LINKER__OpenGL_Debug CMakeFiles\OpenGL.dir\main.cpp.obj CMakeFiles\OpenGL.dir\support\ResourcesManager.cpp.obj CMakeFiles\OpenGL.dir\game\ILoop.cpp.obj CMakeFiles\OpenGL.dir\game\Game.cpp.obj CMakeFiles\OpenGL.dir\graphics\Camera.cpp.obj | external_libraries\glfw\src\glfw3.lib external_libraries\glad\glad.lib || external_libraries\glad\glad.lib external_libraries\glfw\src\glfw3.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = external_libraries\glfw\src\glfw3.lib  external_libraries\glad\glad.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

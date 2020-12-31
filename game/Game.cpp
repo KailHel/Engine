@@ -12,23 +12,25 @@ void Game::Init()
 {
     if (!ResourcesManager::InitGLFW()){ResourcesManager::Destroy();exit(404);}
     if (!ResourcesManager::InitGLAD()){ResourcesManager::Destroy();exit(404);}
-    ResourcesManager::createShaderProgram   (defaultVertexShaderPath,defaultFragmentShaderPath,defaultShaderName);
+    ResourcesManager::createShaderProgram(defaultVertexShaderPath, defaultFragmentShaderPath, defaultShaderName);
     ResourcesManager::createTexture("res/4.png","def");
     window = ResourcesManager::getWindow();
     glClearColor(1,1,0,0);
 
 
-    s = new SK::Render::Sprite(defaultShaderName,"def",glm::vec2(0,0),glm::vec2(800,600),0);
+    s = new SK::Render::Sprite(defaultShaderName,"def",glm::vec2(400,300),glm::vec2(100, 100),0);
 
     //------------------------
     glm::mat4 view(1.f);
     glm::mat4 projection(1.f);
 
+    SK::Render::Camera cam(0,0,800,600);
 
-
-    projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -100.0f, 100.0f );
+    projection = cam.getMatrix4();
     //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     //projection = glm::perspective(45.0f, (GLfloat)800 / (GLfloat)600, 0.1f, 100.0f);
+
+    
 
     ResourcesManager::getShaderByName(defaultShaderName)->use();
     ResourcesManager::getShaderByName(defaultShaderName)->setMatrix4("view",view);
@@ -37,7 +39,7 @@ void Game::Init()
 
 
 
-
+    
 
 
 
@@ -50,7 +52,7 @@ void Game::Render()
 
 
     static GLfloat time = 0.f;
-    time += 0.1f;
+    time += 0.001f;
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
 
@@ -61,6 +63,8 @@ void Game::Render()
 
 
     s->render();
+
+    
 
 
     glfwSwapBuffers(window);

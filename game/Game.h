@@ -14,6 +14,7 @@
 #include "../graphics/Shader.h"
 #include "../graphics/Texture.h"
 #include "../graphics/Sprite.h"
+#include "../graphics/Camera.h"
 
 using std::string;
 using std::cout;

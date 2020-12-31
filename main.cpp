@@ -4,7 +4,6 @@
 #include "game/Game.h"
 
 
-
 int main(int argc ,char ** argv) {
     {
         const string a(argv[0]);
@@ -14,6 +13,8 @@ int main(int argc ,char ** argv) {
         game->start();
         delete game;
     }
+
+
     exit(0);
 }
 //status 0 - Normal Exit
