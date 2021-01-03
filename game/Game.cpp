@@ -2,82 +2,46 @@
 // Created by kail on 28.12.2020.
 //
 
-
-
-
 #include "Game.h"
-
+#include "../graphics/Camera/OrthoCamera.h"
 
 void Game::Init()
 {
-    if (!ResourcesManager::InitGLFW()){ResourcesManager::Destroy();exit(404);}
-    if (!ResourcesManager::InitGLAD()){ResourcesManager::Destroy();exit(404);}
-    ResourcesManager::createShaderProgram(defaultVertexShaderPath, defaultFragmentShaderPath, defaultShaderName);
-    ResourcesManager::createTexture("res/4.png","def");
-    window = ResourcesManager::getWindow();
-    glClearColor(1,1,0,0);
+	if (!ResourcesManager::InitGLFW()) { ResourcesManager::Destroy(); exit(404); }
+	if (!ResourcesManager::InitGLAD()) { ResourcesManager::Destroy(); exit(404); }
+	window = ResourcesManager::getWindow();
+	glClearColor(1, 1, 0, 0);
 
+	shader = ResourcesManager::createShaderProgram(defaultVertexShaderPath, defaultFragmentShaderPath, defaultShaderName);
+	SK::Renderer::SKSurface* surface = ResourcesManager::createSurface("res/4.png", "DEF");
+	SK::Renderer::SKTexture2D* texture = ResourcesManager::createTexture("DEF", "DEF");
+	sprite = ResourcesManager::createSprite2D("DEF", "DEF");
 
-    s = new SK::Render::Sprite(defaultShaderName,"def",glm::vec2(400,300),glm::vec2(100, 100),0);
+	rend = new SK::Renderer::Render(defaultShaderName);
 
-    //------------------------
-    glm::mat4 view(1.f);
-    glm::mat4 projection(1.f);
+	camera = new SK::Renderer::SKOrthoCamera();
+	//------------------------
 
-    SK::Render::Camera cam(0,0,800,600);
+	sprite->position.x = 0;
+	sprite->position.y = 0;
 
-    projection = cam.getMatrix4();
-    //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    //projection = glm::perspective(45.0f, (GLfloat)800 / (GLfloat)600, 0.1f, 100.0f);
-
-    
-
-    ResourcesManager::getShaderByName(defaultShaderName)->use();
-    ResourcesManager::getShaderByName(defaultShaderName)->setMatrix4("view",view);
-    ResourcesManager::getShaderByName(defaultShaderName)->setMatrix4("projection",projection);
-
-
-
-
-    
-
-
-
-    //------------------------
+	sprite->size = vec2(10.f, 10.f);
 }
 
 void Game::Render()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
+	rend->Draw(sprite, glm::mat4(1), glm::mat4(1));
 
-    static GLfloat time = 0.f;
-    time += 0.001f;
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
-
-
-    ResourcesManager::getShaderByName(defaultShaderName)->setFloat1("time",time);
-    ResourcesManager::getShaderByName(defaultShaderName)->setFloat2("resolution",ResourcesManager::WINDOW_W,ResourcesManager::WINDOW_H);
-    ResourcesManager::getShaderByName(defaultShaderName)->setFloat2("mouse",xpos / 230,ypos / 230);
-
-
-    s->render();
-
-    
-
-
-    glfwSwapBuffers(window);
+	glfwSwapBuffers(window);
 }
-
 
 void Game::Update()
 {
-    glfwPollEvents();
+	glfwPollEvents();
 }
-
 
 void Game::Dispose()
 {
-
 }

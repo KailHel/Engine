@@ -49,7 +49,7 @@ build CMakeFiles\OpenGL.dir\main.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\..\ma
   OBJECT_DIR = CMakeFiles\OpenGL.dir
   OBJECT_FILE_DIR = CMakeFiles\OpenGL.dir
   TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
-  TARGET_PDB = OpenGL.pdb
+  TARGET_PDB = bin\OpenGL.pdb
 
 build CMakeFiles\OpenGL.dir\support\ResourcesManager.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\..\support\ResourcesManager.cpp || cmake_object_order_depends_target_OpenGL_Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
@@ -57,7 +57,7 @@ build CMakeFiles\OpenGL.dir\support\ResourcesManager.cpp.obj: CXX_COMPILER__Open
   OBJECT_DIR = CMakeFiles\OpenGL.dir
   OBJECT_FILE_DIR = CMakeFiles\OpenGL.dir\support
   TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
-  TARGET_PDB = OpenGL.pdb
+  TARGET_PDB = bin\OpenGL.pdb
 
 build CMakeFiles\OpenGL.dir\game\ILoop.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\..\game\ILoop.cpp || cmake_object_order_depends_target_OpenGL_Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
@@ -65,7 +65,7 @@ build CMakeFiles\OpenGL.dir\game\ILoop.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..
   OBJECT_DIR = CMakeFiles\OpenGL.dir
   OBJECT_FILE_DIR = CMakeFiles\OpenGL.dir\game
   TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
-  TARGET_PDB = OpenGL.pdb
+  TARGET_PDB = bin\OpenGL.pdb
 
 build CMakeFiles\OpenGL.dir\game\Game.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\..\game\Game.cpp || cmake_object_order_depends_target_OpenGL_Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
@@ -73,15 +73,23 @@ build CMakeFiles\OpenGL.dir\game\Game.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\
   OBJECT_DIR = CMakeFiles\OpenGL.dir
   OBJECT_FILE_DIR = CMakeFiles\OpenGL.dir\game
   TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
-  TARGET_PDB = OpenGL.pdb
+  TARGET_PDB = bin\OpenGL.pdb
 
-build CMakeFiles\OpenGL.dir\graphics\Camera.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\..\graphics\Camera.cpp || cmake_object_order_depends_target_OpenGL_Debug
+build CMakeFiles\OpenGL.dir\graphics\Camera\OrthoCamera.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\..\graphics\Camera\OrthoCamera.cpp || cmake_object_order_depends_target_OpenGL_Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   INCLUDES = -I..\..\..\external_libraries\glm -I..\..\..\external_libraries\glfw\include -I..\..\..\external_libraries\glad\include
   OBJECT_DIR = CMakeFiles\OpenGL.dir
-  OBJECT_FILE_DIR = CMakeFiles\OpenGL.dir\graphics
+  OBJECT_FILE_DIR = CMakeFiles\OpenGL.dir\graphics\Camera
   TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
-  TARGET_PDB = OpenGL.pdb
+  TARGET_PDB = bin\OpenGL.pdb
+
+build CMakeFiles\OpenGL.dir\graphics\Camera\PerspCamera.cpp.obj: CXX_COMPILER__OpenGL_Debug ..\..\..\graphics\Camera\PerspCamera.cpp || cmake_object_order_depends_target_OpenGL_Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
+  INCLUDES = -I..\..\..\external_libraries\glm -I..\..\..\external_libraries\glfw\include -I..\..\..\external_libraries\glad\include
+  OBJECT_DIR = CMakeFiles\OpenGL.dir
+  OBJECT_FILE_DIR = CMakeFiles\OpenGL.dir\graphics\Camera
+  TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
+  TARGET_PDB = bin\OpenGL.pdb
 
 
 # =============================================================================
@@ -89,19 +97,19 @@ build CMakeFiles\OpenGL.dir\graphics\Camera.cpp.obj: CXX_COMPILER__OpenGL_Debug 
 
 
 #############################################
-# Link the executable OpenGL.exe
+# Link the executable bin\OpenGL.exe
 
-build OpenGL.exe: CXX_EXECUTABLE_LINKER__OpenGL_Debug CMakeFiles\OpenGL.dir\main.cpp.obj CMakeFiles\OpenGL.dir\support\ResourcesManager.cpp.obj CMakeFiles\OpenGL.dir\game\ILoop.cpp.obj CMakeFiles\OpenGL.dir\game\Game.cpp.obj CMakeFiles\OpenGL.dir\graphics\Camera.cpp.obj | external_libraries\glfw\src\glfw3.lib external_libraries\glad\glad.lib || external_libraries\glad\glad.lib external_libraries\glfw\src\glfw3.lib
+build bin\OpenGL.exe: CXX_EXECUTABLE_LINKER__OpenGL_Debug CMakeFiles\OpenGL.dir\main.cpp.obj CMakeFiles\OpenGL.dir\support\ResourcesManager.cpp.obj CMakeFiles\OpenGL.dir\game\ILoop.cpp.obj CMakeFiles\OpenGL.dir\game\Game.cpp.obj CMakeFiles\OpenGL.dir\graphics\Camera\OrthoCamera.cpp.obj CMakeFiles\OpenGL.dir\graphics\Camera\PerspCamera.cpp.obj | external_libraries\glfw\src\glfw3.lib external_libraries\glad\glad.lib || external_libraries\glad\glad.lib external_libraries\glfw\src\glfw3.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = external_libraries\glfw\src\glfw3.lib  external_libraries\glad\glad.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\OpenGL.dir
-  POST_BUILD = cd .
+  POST_BUILD = cmd.exe /C "cd /D "C:\Users\kaiii\source\repos\Engine\out\build\x64-Debug (по умолчанию)" && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_directory C:/Users/kaiii/source/repos/Engine/res "C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)/bin/res""
   PRE_LINK = cd .
   TARGET_COMPILE_PDB = CMakeFiles\OpenGL.dir\
-  TARGET_FILE = OpenGL.exe
+  TARGET_FILE = bin\OpenGL.exe
   TARGET_IMPLIB = OpenGL.lib
-  TARGET_PDB = OpenGL.pdb
+  TARGET_PDB = bin\OpenGL.pdb
 
 
 #############################################
@@ -410,7 +418,9 @@ build external_libraries\glad\rebuild_cache: phony external_libraries\glad\CMake
 # =============================================================================
 # Target aliases.
 
-build OpenGL: phony OpenGL.exe
+build OpenGL: phony bin\OpenGL.exe
+
+build OpenGL.exe: phony bin\OpenGL.exe
 
 build glad: phony external_libraries\glad\glad.lib
 
@@ -428,7 +438,7 @@ build glfw3.lib: phony external_libraries\glfw\src\glfw3.lib
 #############################################
 # Folder: C:/Users/kaiii/source/repos/Engine/out/build/x64-Debug (по умолчанию)
 
-build all: phony OpenGL.exe external_libraries\glfw\all external_libraries\glad\all
+build all: phony bin\OpenGL.exe external_libraries\glfw\all external_libraries\glad\all
 
 # =============================================================================
 

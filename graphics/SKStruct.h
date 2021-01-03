@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/matrix.hpp>
 
 
 
@@ -10,12 +11,12 @@ namespace SK {
 
 		//---LoadPixel
 		struct SKSurface {
-			GLenum								Type;
-		    GLuint								channel;
-		    unsigned char*						data;
+			GLenum								Type=GL_R;
+		    GLuint								channel=0;
+		    unsigned char*						data=nullptr;
 
-			GLuint								width;
-			GLuint								height;
+			GLuint								width=0;
+			GLuint								height=0;
 			
 			GLenum filter				=		GL_LINEAR;
 			GLenum wrapMode				=		GL_CLAMP_TO_EDGE;
@@ -23,50 +24,42 @@ namespace SK {
 			GLenum dataType				=		GL_UNSIGNED_BYTE;
 
 			~SKSurface() { delete data; }
+
+			GLboolean isCompile			=		GL_FALSE;
 		};
 		//--------------
 		//---Compile texture
 		struct SKTexture2D {
-			GLenum							    ID;
+			GLenum							    ID=0;
 			GLenum	 ShaderLayer		=		GL_TEXTURE0;
 
-			GLuint								width;
-			GLuint								height;
-			GLenum								FormatType;
+			GLuint								width=0;
+			GLuint								height=0;
+			GLenum								FormatType=GL_R;
 
 			~SKTexture2D() { glDeleteTextures(1, &ID); }
+
+			GLboolean isCompile			=		GL_FALSE;
 		};
 		//--------------
 		//---Shaders----
 		struct SKShader {
-			GLuin		ID;
-			GLboolean   isCompile		=		false;
+			GLuint		ID=0;
+			GLboolean   isCompile		=		GL_FALSE;
 
-			~SKShader(){ glDeleteProgram(ID) }
+			~SKShader() { glDeleteProgram(ID); }
 		};
 		//--------------
 		//---Draw Texture
 		struct SKSprite2D {
-		private:
-			static GLfloat vertices[] = {
-					// Позиции           // Текстурные координаты
-					 1.f,  1.0f, 0.0f,    1.0f, 1.0f,   // Верхний правый
-					 1.f, -1.f, 0.0f,     1.0f, 0.0f,   // Нижний правый
-					-1.f, -1.f, 0.0f,    0.0f, 0.0f,   // Нижний левый
-					-1.f,  1.f, 0.0f,    0.0f, 1.0f    // Верхний левый
-			};
-			static GLuint indices[] = {  // Индексы вертексов
-					0, 1, 3,  // 1 тр
-					1, 2, 3   // 2 тр
-			};
-		public:
-			GLuint VaoID;
-			SKTexture2D*	texture;
-			SKShader*		shader;
+			GLuint VaoID=0;
+			SKTexture2D*	texture=nullptr;
 
 
-			mat4 Matrix4				=		mat4(1.f);
-
+			glm::mat4 Matrix4				= glm::mat4(1.f);
+			glm::vec2   position			= glm::vec2(1.f);
+			glm::vec2   size				= glm::vec2(1.f);
+			float       rotation            = 0.f;
 			~SKSprite2D() { glDeleteVertexArrays( 1 , &VaoID); }
 		};
 	}
