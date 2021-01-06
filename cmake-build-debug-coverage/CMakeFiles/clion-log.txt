@@ -1,0 +1,6 @@
+"/home/kail/Рабочий стол/clion-2020.3.1/bin/cmake/linux/bin/cmake" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=--coverage -DCMAKE_C_FLAGS=--coverage -G "CodeBlocks - Unix Makefiles" "/home/kail/Рабочий стол/Engine"
+-- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE) 
+-- Using X11 for window creation
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/kail/Рабочий стол/Engine/cmake-build-debug-coverage

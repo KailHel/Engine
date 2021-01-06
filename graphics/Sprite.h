@@ -22,19 +22,17 @@ namespace SK {
     namespace Render {
         class Sprite {
         public:
-            Sprite()=delete;
             Sprite(const std::string& ShaderName , const std::string& TextureName,
-                   const glm::vec2& position,
-                   const glm::vec2& size,
-                   const float rotation):
+                   const glm::vec3& position,
+                   const glm::vec2& size):
                    _position(position),
-                   _size(size),
-                   _rotation(rotation){
+                   _size(size){
                 _shader  = ResourcesManager::getShaderByName(ShaderName);
                 _texture = ResourcesManager::getTextureByName(TextureName);
-
+                _angle = 0;
+                _rotation = glm::vec3(1,1,1);
                 GLfloat vertices[] = {
-                        // Позиции          // Цвета             // Текстурные координаты
+                        // Позиции        // Текстурные координаты
                         1.f,  1.0f, 0.0f,    1.0f, 1.0f,   // Верхний правый
                         1.f, -1.f, 0.0f,    1.0f, 0.0f,   // Нижний правый
                         -1.f, -1.f, 0.0f,    0.0f, 0.0f,   // Нижний левый
@@ -76,21 +74,15 @@ namespace SK {
              
 
             }
-            ~Sprite() {
-
-            }
-
             void render() {
                 _shader->use();
                 _texture->bind();
 
                 glm::mat4 model(1.f);
-
-
-                model = glm::translate(model , glm::vec3(_position , 0.f));
-                model = glm::translate(model, glm::vec3(0.5f * ResourcesManager::WINDOW_W , 0.5 * ResourcesManager::WINDOW_H ,0.f));
-                model = glm::rotate(model , glm::radians(_rotation),glm::vec3(0.f,0.f,1.f));
-                model = glm::translate(model, glm::vec3(-0.5f * ResourcesManager::WINDOW_W , -0.5 * ResourcesManager::WINDOW_H ,0.f));
+                model = glm::translate(model , _position);
+                //model = glm::translate(model, glm::vec3(0.5f * ResourcesManager::WINDOW_W , 0.5 * ResourcesManager::WINDOW_H ,0.f));
+                model = glm::rotate(model , glm::radians(_angle),_rotation);
+                //model = glm::translate(model, glm::vec3(-0.5f * ResourcesManager::WINDOW_W , -0.5 * ResourcesManager::WINDOW_H ,0.f));
                 model = glm::scale(model,glm::vec3(_size,1.f));
                 _shader->setMatrix4("model",model);
 
@@ -109,10 +101,22 @@ namespace SK {
             Texture* _texture;
 
 
-            glm::vec2   _position;
+            glm::vec3   _position;
             glm::vec2   _size;
-            float       _rotation;
 
+
+        public:
+            glm::vec3   _rotation;
+            float       _angle;
+            ~Sprite(){
+                glDeleteBuffers(1,&vbo);
+                glDeleteBuffers(1,&ebo);
+                glDeleteBuffers(1,&vao);
+            }
+            Sprite() = delete;
+            Sprite(const Sprite&) = delete;
+            Sprite& operator=(const Sprite&) = delete;
+            Sprite& operator=(Sprite&&) = delete;
         };
 
     }

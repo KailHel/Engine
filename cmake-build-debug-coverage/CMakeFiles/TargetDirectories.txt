@@ -1,0 +1,11 @@
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/rebuild_cache.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/edit_cache.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/CMakeFiles/rebuild_cache.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/CMakeFiles/edit_cache.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/rebuild_cache.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/edit_cache.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glad/CMakeFiles/edit_cache.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glad/CMakeFiles/rebuild_cache.dir
+/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glad/CMakeFiles/glad.dir

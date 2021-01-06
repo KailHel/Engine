@@ -1,0 +1,70 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/graphics/Texture.h
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/Game.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/Game.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// Created by kail on 27.12.2020.
+        -:    3://
+        -:    4:
+        -:    5:#ifndef OPENGL_TEXTURE_H
+        -:    6:#define OPENGL_TEXTURE_H
+        -:    7:
+        -:    8:#include "glad/glad.h"
+        -:    9:#include "string"
+        -:   10:#include "../external_libraries/stbi//stb_image.h"
+        -:   11:
+        -:   12:#include "../support//ResourcesManager.h"
+        -:   13:namespace SK {
+        -:   14:    namespace Render {
+        -:   15:        class Texture {
+        -:   16:        public:
+        -:   17:            //################################################################################################################################
+        -:   18:            Texture(const GLuint width, const GLuint height,
+        -:   19:                    const unsigned char *data,
+        -:   20:                    const unsigned int channel = 4,
+        -:   21:                    const GLenum filter = GL_LINEAR,
+        -:   22:                    const GLenum wrapMode = GL_CLAMP_TO_EDGE) : _width(width), _height(height) {
+        -:   23:                GLenum mode = GL_RGB;
+        -:   24:                switch (channel) {
+        -:   25:                    case 4:
+        -:   26:                        mode = GL_RGBA;
+        -:   27:                        break;
+        -:   28:                    case 3:
+        -:   29:                        mode = GL_RGB;
+        -:   30:                        break;
+        -:   31:                    default:
+        -:   32:                        mode = GL_RGBA;
+        -:   33:                        break;
+        -:   34:                }
+        -:   35:                glGenTextures(1, &ID);
+        -:   36:                glBindTexture(GL_TEXTURE_2D, ID);
+        -:   37:                glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode, GL_UNSIGNED_BYTE, data);
+        -:   38:
+        -:   39:                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+        -:   40:                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+        -:   41:                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+        -:   42:                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+        -:   43:
+        -:   44:                delete data;
+        -:   45:            }
+        -:   46:
+        -:   47:            Texture() = delete;
+        -:   48:
+        -:   49:            ~Texture() {
+        -:   50:                glDeleteTextures(1, &ID);
+        -:   51:            }
+        -:   52:            //################################################################################################################################
+      515:   53:            void bind() const {
+      515:   54:                glBindTexture(GL_TEXTURE_2D, ID);
+      515:   54-block  0
+      515:   55:            }
+        -:   56:
+        -:   57:        private:
+        -:   58:            GLuint ID;
+        -:   59:            unsigned int _width = 0;
+        -:   60:            unsigned int _height = 0;
+        -:   61:
+        -:   62:        };
+        -:   63:    }
+        -:   64:}
+        -:   65:#endif //OPENGL_TEXTURE_H

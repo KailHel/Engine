@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="glad"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\external_libraries\;CMake Files\external_libraries\glfw\;CMake Files\external_libraries\glfw\CMake\;CMake Files\external_libraries\glfw\src\;CMake Files\external_libraries\glad\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glad"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glad">
+				<Option output="/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glad/libglad.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glad"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/kail/Рабочий стол/Engine/external_libraries/glad/include"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 glad"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glad/fast">
+				<Option output="/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glad/libglad.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glad"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/kail/Рабочий стол/Engine/external_libraries/glad/include"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 glad/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/kail/Рабочий\ стол/Engine/cmake-build-debug-coverage/external_libraries/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/kail/Рабочий стол/Engine/external_libraries/glad/include/glad/glad.h">
+			<Option target="glad"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/Engine/external_libraries/glad/src/glad.c">
+			<Option target="glad"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/Engine/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/Engine/external_libraries/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external_libraries\glfw\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/Engine/external_libraries/glfw/CMake/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\external_libraries\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/Engine/external_libraries/glfw/CMake/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\external_libraries\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/Engine/external_libraries/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external_libraries\glfw\src\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/Engine/external_libraries/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\external_libraries\glfw\src\"/>
+		</Unit>
+		<Unit filename="/home/kail/Рабочий стол/Engine/external_libraries/glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\external_libraries\glad\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

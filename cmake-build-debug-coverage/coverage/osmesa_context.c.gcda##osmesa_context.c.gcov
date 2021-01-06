@@ -1,0 +1,483 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/external_libraries/glfw/src/osmesa_context.c
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/osmesa_context.c.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/osmesa_context.c.gcda
+        -:    0:Runs:1
+        -:    1://========================================================================
+        -:    2:// GLFW 3.4 OSMesa - www.glfw.org
+        -:    3://------------------------------------------------------------------------
+        -:    4:// Copyright (c) 2016 Google Inc.
+        -:    5:// Copyright (c) 2016-2017 Camilla Löwy <elmindreda@glfw.org>
+        -:    6://
+        -:    7:// This software is provided 'as-is', without any express or implied
+        -:    8:// warranty. In no event will the authors be held liable for any damages
+        -:    9:// arising from the use of this software.
+        -:   10://
+        -:   11:// Permission is granted to anyone to use this software for any purpose,
+        -:   12:// including commercial applications, and to alter it and redistribute it
+        -:   13:// freely, subject to the following restrictions:
+        -:   14://
+        -:   15:// 1. The origin of this software must not be misrepresented; you must not
+        -:   16://    claim that you wrote the original software. If you use this software
+        -:   17://    in a product, an acknowledgment in the product documentation would
+        -:   18://    be appreciated but is not required.
+        -:   19://
+        -:   20:// 2. Altered source versions must be plainly marked as such, and must not
+        -:   21://    be misrepresented as being the original software.
+        -:   22://
+        -:   23:// 3. This notice may not be removed or altered from any source
+        -:   24://    distribution.
+        -:   25://
+        -:   26://========================================================================
+        -:   27:// Please use C89 style variable declarations in this file because VS 2010
+        -:   28://========================================================================
+        -:   29:
+        -:   30:#include <stdlib.h>
+        -:   31:#include <string.h>
+        -:   32:#include <assert.h>
+        -:   33:
+        -:   34:#include "internal.h"
+        -:   35:
+        -:   36:
+    #####:   37:static void makeContextCurrentOSMesa(_GLFWwindow* window)
+        -:   38:{
+    #####:   39:    if (window)
+    %%%%%:   39-block  0
+        -:   40:    {
+        -:   41:        int width, height;
+    #####:   42:        _glfwPlatformGetFramebufferSize(window, &width, &height);
+    %%%%%:   42-block  0
+        -:   43:
+        -:   44:        // Check to see if we need to allocate a new buffer
+    #####:   45:        if ((window->context.osmesa.buffer == NULL) ||
+    #####:   46:            (width != window->context.osmesa.width) ||
+    %%%%%:   46-block  0
+    #####:   47:            (height != window->context.osmesa.height))
+    %%%%%:   47-block  0
+        -:   48:        {
+    #####:   49:            free(window->context.osmesa.buffer);
+        -:   50:
+        -:   51:            // Allocate the new buffer (width * height * 8-bit RGBA)
+    #####:   52:            window->context.osmesa.buffer = calloc(4, (size_t) width * height);
+    #####:   53:            window->context.osmesa.width  = width;
+    #####:   54:            window->context.osmesa.height = height;
+    %%%%%:   54-block  0
+        -:   55:        }
+        -:   56:
+    #####:   57:        if (!OSMesaMakeCurrent(window->context.osmesa.handle,
+    %%%%%:   57-block  0
+        -:   58:                               window->context.osmesa.buffer,
+        -:   59:                               GL_UNSIGNED_BYTE,
+        -:   60:                               width, height))
+        -:   61:        {
+    #####:   62:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:   62-block  0
+        -:   63:                            "OSMesa: Failed to make context current");
+    #####:   64:            return;
+        -:   65:        }
+        -:   66:    }
+        -:   67:
+    #####:   68:    _glfwPlatformSetTls(&_glfw.contextSlot, window);
+    %%%%%:   68-block  0
+        -:   69:}
+        -:   70:
+    #####:   71:static GLFWglproc getProcAddressOSMesa(const char* procname)
+        -:   72:{
+    #####:   73:    return (GLFWglproc) OSMesaGetProcAddress(procname);
+    %%%%%:   73-block  0
+        -:   74:}
+        -:   75:
+    #####:   76:static void destroyContextOSMesa(_GLFWwindow* window)
+        -:   77:{
+    #####:   78:    if (window->context.osmesa.handle)
+    %%%%%:   78-block  0
+        -:   79:    {
+    #####:   80:        OSMesaDestroyContext(window->context.osmesa.handle);
+    %%%%%:   80-block  0
+    #####:   81:        window->context.osmesa.handle = NULL;
+        -:   82:    }
+        -:   83:
+    #####:   84:    if (window->context.osmesa.buffer)
+    %%%%%:   84-block  0
+        -:   85:    {
+    #####:   86:        free(window->context.osmesa.buffer);
+    #####:   87:        window->context.osmesa.width = 0;
+    #####:   88:        window->context.osmesa.height = 0;
+    %%%%%:   88-block  0
+        -:   89:    }
+    #####:   90:}
+        -:   91:
+    #####:   92:static void swapBuffersOSMesa(_GLFWwindow* window)
+        -:   93:{
+        -:   94:    // No double buffering on OSMesa
+    #####:   95:}
+        -:   96:
+    #####:   97:static void swapIntervalOSMesa(int interval)
+        -:   98:{
+        -:   99:    // No swap interval on OSMesa
+    #####:  100:}
+        -:  101:
+    #####:  102:static int extensionSupportedOSMesa(const char* extension)
+        -:  103:{
+        -:  104:    // OSMesa does not have extensions
+    #####:  105:    return GLFW_FALSE;
+    %%%%%:  105-block  0
+        -:  106:}
+        -:  107:
+        -:  108:
+        -:  109://////////////////////////////////////////////////////////////////////////
+        -:  110://////                       GLFW internal API                      //////
+        -:  111://////////////////////////////////////////////////////////////////////////
+        -:  112:
+    #####:  113:GLFWbool _glfwInitOSMesa(void)
+        -:  114:{
+        -:  115:    int i;
+    #####:  116:    const char* sonames[] =
+        -:  117:    {
+        -:  118:#if defined(_GLFW_OSMESA_LIBRARY)
+        -:  119:        _GLFW_OSMESA_LIBRARY,
+        -:  120:#elif defined(_WIN32)
+        -:  121:        "libOSMesa.dll",
+        -:  122:        "OSMesa.dll",
+        -:  123:#elif defined(__APPLE__)
+        -:  124:        "libOSMesa.8.dylib",
+        -:  125:#elif defined(__CYGWIN__)
+        -:  126:        "libOSMesa-8.so",
+        -:  127:#else
+        -:  128:        "libOSMesa.so.8",
+        -:  129:        "libOSMesa.so.6",
+        -:  130:#endif
+        -:  131:        NULL
+        -:  132:    };
+        -:  133:
+    #####:  134:    if (_glfw.osmesa.handle)
+    %%%%%:  134-block  0
+    #####:  135:        return GLFW_TRUE;
+    %%%%%:  135-block  0
+        -:  136:
+    #####:  137:    for (i = 0;  sonames[i];  i++)
+    %%%%%:  137-block  0
+    %%%%%:  137-block  1
+    %%%%%:  137-block  2
+        -:  138:    {
+    #####:  139:        _glfw.osmesa.handle = _glfw_dlopen(sonames[i]);
+    %%%%%:  139-block  0
+    #####:  140:        if (_glfw.osmesa.handle)
+    #####:  141:            break;
+    %%%%%:  141-block  0
+        -:  142:    }
+        -:  143:
+    #####:  144:    if (!_glfw.osmesa.handle)
+    %%%%%:  144-block  0
+        -:  145:    {
+    #####:  146:        _glfwInputError(GLFW_API_UNAVAILABLE, "OSMesa: Library not found");
+    %%%%%:  146-block  0
+    #####:  147:        return GLFW_FALSE;
+        -:  148:    }
+        -:  149:
+    #####:  150:    _glfw.osmesa.CreateContextExt = (PFN_OSMesaCreateContextExt)
+    #####:  151:        _glfw_dlsym(_glfw.osmesa.handle, "OSMesaCreateContextExt");
+    %%%%%:  151-block  0
+    #####:  152:    _glfw.osmesa.CreateContextAttribs = (PFN_OSMesaCreateContextAttribs)
+    #####:  153:        _glfw_dlsym(_glfw.osmesa.handle, "OSMesaCreateContextAttribs");
+    #####:  154:    _glfw.osmesa.DestroyContext = (PFN_OSMesaDestroyContext)
+    #####:  155:        _glfw_dlsym(_glfw.osmesa.handle, "OSMesaDestroyContext");
+    #####:  156:    _glfw.osmesa.MakeCurrent = (PFN_OSMesaMakeCurrent)
+    #####:  157:        _glfw_dlsym(_glfw.osmesa.handle, "OSMesaMakeCurrent");
+    #####:  158:    _glfw.osmesa.GetColorBuffer = (PFN_OSMesaGetColorBuffer)
+    #####:  159:        _glfw_dlsym(_glfw.osmesa.handle, "OSMesaGetColorBuffer");
+    #####:  160:    _glfw.osmesa.GetDepthBuffer = (PFN_OSMesaGetDepthBuffer)
+    #####:  161:        _glfw_dlsym(_glfw.osmesa.handle, "OSMesaGetDepthBuffer");
+    #####:  162:    _glfw.osmesa.GetProcAddress = (PFN_OSMesaGetProcAddress)
+    #####:  163:        _glfw_dlsym(_glfw.osmesa.handle, "OSMesaGetProcAddress");
+        -:  164:
+    #####:  165:    if (!_glfw.osmesa.CreateContextExt ||
+    #####:  166:        !_glfw.osmesa.DestroyContext ||
+    %%%%%:  166-block  0
+    #####:  167:        !_glfw.osmesa.MakeCurrent ||
+    %%%%%:  167-block  0
+    #####:  168:        !_glfw.osmesa.GetColorBuffer ||
+    %%%%%:  168-block  0
+    #####:  169:        !_glfw.osmesa.GetDepthBuffer ||
+    %%%%%:  169-block  0
+    #####:  170:        !_glfw.osmesa.GetProcAddress)
+    %%%%%:  170-block  0
+        -:  171:    {
+    #####:  172:        _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  172-block  0
+        -:  173:                        "OSMesa: Failed to load required entry points");
+        -:  174:
+    #####:  175:        _glfwTerminateOSMesa();
+    #####:  176:        return GLFW_FALSE;
+        -:  177:    }
+        -:  178:
+    #####:  179:    return GLFW_TRUE;
+    %%%%%:  179-block  0
+        -:  180:}
+        -:  181:
+    #####:  182:void _glfwTerminateOSMesa(void)
+        -:  183:{
+    #####:  184:    if (_glfw.osmesa.handle)
+    %%%%%:  184-block  0
+        -:  185:    {
+    #####:  186:        _glfw_dlclose(_glfw.osmesa.handle);
+    %%%%%:  186-block  0
+    #####:  187:        _glfw.osmesa.handle = NULL;
+        -:  188:    }
+    #####:  189:}
+        -:  190:
+        -:  191:#define setAttrib(a, v) \
+        -:  192:{ \
+        -:  193:    assert(((size_t) index + 1) < sizeof(attribs) / sizeof(attribs[0])); \
+        -:  194:    attribs[index++] = a; \
+        -:  195:    attribs[index++] = v; \
+        -:  196:}
+        -:  197:
+    #####:  198:GLFWbool _glfwCreateContextOSMesa(_GLFWwindow* window,
+        -:  199:                                  const _GLFWctxconfig* ctxconfig,
+        -:  200:                                  const _GLFWfbconfig* fbconfig)
+        -:  201:{
+    #####:  202:    OSMesaContext share = NULL;
+    #####:  203:    const int accumBits = fbconfig->accumRedBits +
+    #####:  204:                          fbconfig->accumGreenBits +
+    #####:  205:                          fbconfig->accumBlueBits +
+    #####:  206:                          fbconfig->accumAlphaBits;
+        -:  207:
+    #####:  208:    if (ctxconfig->client == GLFW_OPENGL_ES_API)
+    %%%%%:  208-block  0
+        -:  209:    {
+    #####:  210:        _glfwInputError(GLFW_API_UNAVAILABLE,
+    %%%%%:  210-block  0
+        -:  211:                        "OSMesa: OpenGL ES is not available on OSMesa");
+    #####:  212:        return GLFW_FALSE;
+        -:  213:    }
+        -:  214:
+    #####:  215:    if (ctxconfig->share)
+    %%%%%:  215-block  0
+    #####:  216:        share = ctxconfig->share->context.osmesa.handle;
+    %%%%%:  216-block  0
+        -:  217:
+    #####:  218:    if (OSMesaCreateContextAttribs)
+    %%%%%:  218-block  0
+        -:  219:    {
+    #####:  220:        int index = 0, attribs[40];
+        -:  221:
+    #####:  222:        setAttrib(OSMESA_FORMAT, OSMESA_RGBA);
+    %%%%%:  222-block  0
+    %%%%%:  222-block  1
+    #####:  223:        setAttrib(OSMESA_DEPTH_BITS, fbconfig->depthBits);
+    %%%%%:  223-block  0
+    %%%%%:  223-block  1
+    #####:  224:        setAttrib(OSMESA_STENCIL_BITS, fbconfig->stencilBits);
+    %%%%%:  224-block  0
+    %%%%%:  224-block  1
+    #####:  225:        setAttrib(OSMESA_ACCUM_BITS, accumBits);
+    %%%%%:  225-block  0
+    %%%%%:  225-block  1
+        -:  226:
+    #####:  227:        if (ctxconfig->profile == GLFW_OPENGL_CORE_PROFILE)
+    %%%%%:  227-block  0
+        -:  228:        {
+    #####:  229:            setAttrib(OSMESA_PROFILE, OSMESA_CORE_PROFILE);
+    %%%%%:  229-block  0
+    %%%%%:  229-block  1
+    %%%%%:  229-block  2
+        -:  230:        }
+    #####:  231:        else if (ctxconfig->profile == GLFW_OPENGL_COMPAT_PROFILE)
+    %%%%%:  231-block  0
+        -:  232:        {
+    #####:  233:            setAttrib(OSMESA_PROFILE, OSMESA_COMPAT_PROFILE);
+    %%%%%:  233-block  0
+    %%%%%:  233-block  1
+    %%%%%:  233-block  2
+        -:  234:        }
+        -:  235:
+    #####:  236:        if (ctxconfig->major != 1 || ctxconfig->minor != 0)
+    %%%%%:  236-block  0
+    %%%%%:  236-block  1
+        -:  237:        {
+    #####:  238:            setAttrib(OSMESA_CONTEXT_MAJOR_VERSION, ctxconfig->major);
+    %%%%%:  238-block  0
+    %%%%%:  238-block  1
+    #####:  239:            setAttrib(OSMESA_CONTEXT_MINOR_VERSION, ctxconfig->minor);
+    %%%%%:  239-block  0
+    %%%%%:  239-block  1
+    %%%%%:  239-block  2
+        -:  240:        }
+        -:  241:
+    #####:  242:        if (ctxconfig->forward)
+    %%%%%:  242-block  0
+        -:  243:        {
+    #####:  244:            _glfwInputError(GLFW_VERSION_UNAVAILABLE,
+    %%%%%:  244-block  0
+        -:  245:                            "OSMesa: Forward-compatible contexts not supported");
+    #####:  246:            return GLFW_FALSE;
+        -:  247:        }
+        -:  248:
+    #####:  249:        setAttrib(0, 0);
+    %%%%%:  249-block  0
+    %%%%%:  249-block  1
+        -:  250:
+    #####:  251:        window->context.osmesa.handle =
+    #####:  252:            OSMesaCreateContextAttribs(attribs, share);
+    %%%%%:  252-block  0
+        -:  253:    }
+        -:  254:    else
+        -:  255:    {
+    #####:  256:        if (ctxconfig->profile)
+    %%%%%:  256-block  0
+        -:  257:        {
+    #####:  258:            _glfwInputError(GLFW_VERSION_UNAVAILABLE,
+    %%%%%:  258-block  0
+        -:  259:                            "OSMesa: OpenGL profiles unavailable");
+    #####:  260:            return GLFW_FALSE;
+        -:  261:        }
+        -:  262:
+    #####:  263:        window->context.osmesa.handle =
+    #####:  264:            OSMesaCreateContextExt(OSMESA_RGBA,
+    %%%%%:  264-block  0
+        -:  265:                                   fbconfig->depthBits,
+        -:  266:                                   fbconfig->stencilBits,
+        -:  267:                                   accumBits,
+        -:  268:                                   share);
+        -:  269:    }
+        -:  270:
+    #####:  271:    if (window->context.osmesa.handle == NULL)
+    %%%%%:  271-block  0
+        -:  272:    {
+    #####:  273:        _glfwInputError(GLFW_VERSION_UNAVAILABLE,
+    %%%%%:  273-block  0
+        -:  274:                        "OSMesa: Failed to create context");
+    #####:  275:        return GLFW_FALSE;
+        -:  276:    }
+        -:  277:
+    #####:  278:    window->context.makeCurrent = makeContextCurrentOSMesa;
+    #####:  279:    window->context.swapBuffers = swapBuffersOSMesa;
+    #####:  280:    window->context.swapInterval = swapIntervalOSMesa;
+    #####:  281:    window->context.extensionSupported = extensionSupportedOSMesa;
+    #####:  282:    window->context.getProcAddress = getProcAddressOSMesa;
+    #####:  283:    window->context.destroy = destroyContextOSMesa;
+        -:  284:
+    #####:  285:    return GLFW_TRUE;
+    %%%%%:  285-block  0
+        -:  286:}
+        -:  287:
+        -:  288:#undef setAttrib
+        -:  289:
+        -:  290:
+        -:  291://////////////////////////////////////////////////////////////////////////
+        -:  292://////                        GLFW native API                       //////
+        -:  293://////////////////////////////////////////////////////////////////////////
+        -:  294:
+    #####:  295:GLFWAPI int glfwGetOSMesaColorBuffer(GLFWwindow* handle, int* width,
+        -:  296:                                     int* height, int* format, void** buffer)
+        -:  297:{
+        -:  298:    void* mesaBuffer;
+        -:  299:    GLint mesaWidth, mesaHeight, mesaFormat;
+    #####:  300:    _GLFWwindow* window = (_GLFWwindow*) handle;
+    #####:  301:    assert(window != NULL);
+    %%%%%:  301-block  0
+    %%%%%:  301-block  1
+        -:  302:
+    #####:  303:    _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
+    %%%%%:  303-block  0
+    %%%%%:  303-block  1
+        -:  304:
+    #####:  305:    if (!OSMesaGetColorBuffer(window->context.osmesa.handle,
+    %%%%%:  305-block  0
+        -:  306:                              &mesaWidth, &mesaHeight,
+        -:  307:                              &mesaFormat, &mesaBuffer))
+        -:  308:    {
+    #####:  309:        _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  309-block  0
+        -:  310:                        "OSMesa: Failed to retrieve color buffer");
+    #####:  311:        return GLFW_FALSE;
+        -:  312:    }
+        -:  313:
+    #####:  314:    if (width)
+    %%%%%:  314-block  0
+    #####:  315:        *width = mesaWidth;
+    %%%%%:  315-block  0
+    #####:  316:    if (height)
+    %%%%%:  316-block  0
+    #####:  317:        *height = mesaHeight;
+    %%%%%:  317-block  0
+    #####:  318:    if (format)
+    %%%%%:  318-block  0
+    #####:  319:        *format = mesaFormat;
+    %%%%%:  319-block  0
+    #####:  320:    if (buffer)
+    %%%%%:  320-block  0
+    #####:  321:        *buffer = mesaBuffer;
+    %%%%%:  321-block  0
+        -:  322:
+    #####:  323:    return GLFW_TRUE;
+    %%%%%:  323-block  0
+        -:  324:}
+        -:  325:
+    #####:  326:GLFWAPI int glfwGetOSMesaDepthBuffer(GLFWwindow* handle,
+        -:  327:                                     int* width, int* height,
+        -:  328:                                     int* bytesPerValue,
+        -:  329:                                     void** buffer)
+        -:  330:{
+        -:  331:    void* mesaBuffer;
+        -:  332:    GLint mesaWidth, mesaHeight, mesaBytes;
+    #####:  333:    _GLFWwindow* window = (_GLFWwindow*) handle;
+    #####:  334:    assert(window != NULL);
+    %%%%%:  334-block  0
+    %%%%%:  334-block  1
+        -:  335:
+    #####:  336:    _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
+    %%%%%:  336-block  0
+    %%%%%:  336-block  1
+        -:  337:
+    #####:  338:    if (!OSMesaGetDepthBuffer(window->context.osmesa.handle,
+    %%%%%:  338-block  0
+        -:  339:                              &mesaWidth, &mesaHeight,
+        -:  340:                              &mesaBytes, &mesaBuffer))
+        -:  341:    {
+    #####:  342:        _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  342-block  0
+        -:  343:                        "OSMesa: Failed to retrieve depth buffer");
+    #####:  344:        return GLFW_FALSE;
+        -:  345:    }
+        -:  346:
+    #####:  347:    if (width)
+    %%%%%:  347-block  0
+    #####:  348:        *width = mesaWidth;
+    %%%%%:  348-block  0
+    #####:  349:    if (height)
+    %%%%%:  349-block  0
+    #####:  350:        *height = mesaHeight;
+    %%%%%:  350-block  0
+    #####:  351:    if (bytesPerValue)
+    %%%%%:  351-block  0
+    #####:  352:        *bytesPerValue = mesaBytes;
+    %%%%%:  352-block  0
+    #####:  353:    if (buffer)
+    %%%%%:  353-block  0
+    #####:  354:        *buffer = mesaBuffer;
+    %%%%%:  354-block  0
+        -:  355:
+    #####:  356:    return GLFW_TRUE;
+    %%%%%:  356-block  0
+        -:  357:}
+        -:  358:
+    #####:  359:GLFWAPI OSMesaContext glfwGetOSMesaContext(GLFWwindow* handle)
+        -:  360:{
+    #####:  361:    _GLFWwindow* window = (_GLFWwindow*) handle;
+    #####:  362:    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+    %%%%%:  362-block  0
+    %%%%%:  362-block  1
+        -:  363:
+    #####:  364:    if (window->context.client == GLFW_NO_API)
+    %%%%%:  364-block  0
+        -:  365:    {
+    #####:  366:        _glfwInputError(GLFW_NO_WINDOW_CONTEXT, NULL);
+    %%%%%:  366-block  0
+    #####:  367:        return NULL;
+        -:  368:    }
+        -:  369:
+    #####:  370:    return window->context.osmesa.handle;
+    %%%%%:  370-block  0
+        -:  371:}
+        -:  372:

@@ -1,20 +1,31 @@
 #include "Camera.h"
+#include "../support/ResourcesManager.h"
 
-SK::Render::Camera::Camera(const GLfloat x, const GLfloat y, const GLfloat w, const GLfloat h, const GLfloat zNear, const GLfloat zFar)
-{
-	_Matrix4 = ortho(x, w, y, h, zNear, zFar);
+#include <glm/ext.hpp>
+
+Camera::Camera(vec3 position, float fov) : position(position), fov(fov), rotation(1.0f) {
+	updateVectors();
 }
 
-const mat4 SK::Render::Camera::getMatrix4() const
-{
-	return _Matrix4;
+void Camera::updateVectors(){
+	front = vec3(rotation * vec4(0,0,-1,1));
+	right = vec3(rotation * vec4(1,0,0,1));
+	up = vec3(rotation * vec4(0,1,0,1));
 }
 
-void SK::Render::Camera::Move(const vec3& vecMove)
-{
-	_Matrix4 = translate(_Matrix4, vecMove);
+void Camera::rotate(float x, float y, float z){
+	rotation = glm::rotate(rotation, z, vec3(0,0,1));
+	rotation = glm::rotate(rotation, y, vec3(0,1,0));
+	rotation = glm::rotate(rotation, x, vec3(1,0,0));
+
+	updateVectors();
 }
-void SK::Render::Camera::Rotate(const GLfloat grad)
-{
-	_Matrix4 = rotate(_Matrix4, radians(grad), vec3(0.f, 0.f, 1.f));
+
+mat4 Camera::getProjection(){
+	float aspect = (float)ResourcesManager::WINDOW_W / (float)ResourcesManager::WINDOW_H;
+	return glm::perspective(fov, aspect, 0.001f, 1500.0f);
+}
+
+mat4 Camera::getView(){
+	return glm::lookAt(position, position+front, up);
 }

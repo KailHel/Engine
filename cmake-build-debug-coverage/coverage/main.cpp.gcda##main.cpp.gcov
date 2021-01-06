@@ -1,0 +1,36 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/main.cpp
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/main.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1:
+        -:    2:
+        -:    3:#include <string>
+        -:    4:#include "game/Game.h"
+        -:    5:
+        -:    6:
+        1:    7:int main(int argc ,char ** argv) {
+        -:    8:    {
+       1*:    9:        const string a(argv[0]);
+        1:    9-block  0
+    %%%%%:    9-block  1
+    $$$$$:    9-block  2
+    $$$$$:    9-block  3
+        1:   10:        ResourcesManager::setDefaultPath(a);
+        1:   11:        Game* game = new Game();
+        1:   11-block  0
+        1:   11-block  1
+    $$$$$:   11-block  2
+        1:   12:        game->setFPS(59);
+        1:   12-block  0
+        1:   13:        game->start();
+        1:   13-block  0
+    #####:   14:        delete game;
+    %%%%%:   14-block  0
+    %%%%%:   14-block  1
+        -:   15:    }
+        -:   16:
+        -:   17:
+    #####:   18:    exit(0);
+        -:   19:}
+        -:   20://status 0 - Normal Exit
+        -:   21://status 3 - Shader Error Compile

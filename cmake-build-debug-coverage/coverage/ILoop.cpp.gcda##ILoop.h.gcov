@@ -1,0 +1,72 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/game/ILoop.h
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/ILoop.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/ILoop.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#include <chrono>
+        -:    2:#include <thread>
+        -:    3:#include <iostream>
+        -:    4:#pragma once
+        -:    5:
+        -:    6:namespace SK {
+        -:    7:    namespace GAME {
+        -:    8:        class IFpsController {
+        -:    9:        private:
+        -:   10:            //------------------------------------------------
+        -:   11:            std::chrono::high_resolution_clock _HighClock = std::chrono::high_resolution_clock();
+        -:   12:            //------------------------------------------------
+        -:   13:            long long _lastTime = 0;
+        -:   14:            long long _now = 0;
+        -:   15:            long long _eqls = 0;
+        -:   16:            long double _delta = 0;
+        -:   17:            long long _count = 0;
+        -:   18:            bool _onRender = false;
+        -:   19:            int _Update_Rate = 60;
+        -:   20:            int _Idle_Time = 10;
+        -:   21:            //------------------------------------------------
+        -:   22:            int UPD = 0;
+        -:   23:            int LAG = 0;
+        -:   24:            int FPS = 0;
+        -:   25:            int L_FPS = 0;
+        -:   26:            int L_UPD = 0;
+        -:   27:            int L_LAG = 0;
+        -:   28:            //------------------------------------------------
+        -:   29:            const long long _Second = 1000000000;
+        -:   30:            long double _Update_Interval = _Second / _Update_Rate;
+        -:   31:            //------------------------------------------------
+        -:   32:        public:
+        -:   33:            bool isRunning = false;
+        -:   34:
+        -:   35:            IFpsController() = default;
+        -:   36:
+        -:   37:            ~IFpsController() = default;
+        -:   38:
+        -:   39:            virtual void start();
+        -:   40:
+        -:   41:            //------------------------------------------------
+        -:   42:            virtual void Init() = 0;
+        -:   43:
+        -:   44:            virtual void Update() = 0;
+        -:   45:
+        -:   46:            virtual void Render() = 0;
+        -:   47:
+        -:   48:            virtual void Dispose() = 0;
+        -:   49:
+        -:   50:            //------------------------------------------------
+        1:   51:            virtual void setFPS(int fps) {
+        1:   52:                _Update_Rate = fps;
+        1:   53:                _Update_Interval = _Second / _Update_Rate;
+        1:   54:            }
+        -:   55:
+    #####:   56:            virtual int getFps() { return L_FPS; }
+    %%%%%:   56-block  0
+    #####:   57:            virtual int getLag() { return L_LAG; }
+    %%%%%:   57-block  0
+        -:   58:            //------------------------------------------------
+        -:   59:        private:
+     1350:   60:            long long _getNanoTime() {
+     1350:   61:                return _HighClock.now().time_since_epoch().count();
+     1350:   61-block  0
+        -:   62:            }
+        -:   63:        };
+        -:   64:    }
+        -:   65:}

@@ -1,0 +1,1002 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/external_libraries/glfw/src/context.c
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/context.c.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/context.c.gcda
+        -:    0:Runs:1
+        -:    1://========================================================================
+        -:    2:// GLFW 3.4 - www.glfw.org
+        -:    3://------------------------------------------------------------------------
+        -:    4:// Copyright (c) 2002-2006 Marcus Geelnard
+        -:    5:// Copyright (c) 2006-2016 Camilla Löwy <elmindreda@glfw.org>
+        -:    6://
+        -:    7:// This software is provided 'as-is', without any express or implied
+        -:    8:// warranty. In no event will the authors be held liable for any damages
+        -:    9:// arising from the use of this software.
+        -:   10://
+        -:   11:// Permission is granted to anyone to use this software for any purpose,
+        -:   12:// including commercial applications, and to alter it and redistribute it
+        -:   13:// freely, subject to the following restrictions:
+        -:   14://
+        -:   15:// 1. The origin of this software must not be misrepresented; you must not
+        -:   16://    claim that you wrote the original software. If you use this software
+        -:   17://    in a product, an acknowledgment in the product documentation would
+        -:   18://    be appreciated but is not required.
+        -:   19://
+        -:   20:// 2. Altered source versions must be plainly marked as such, and must not
+        -:   21://    be misrepresented as being the original software.
+        -:   22://
+        -:   23:// 3. This notice may not be removed or altered from any source
+        -:   24://    distribution.
+        -:   25://
+        -:   26://========================================================================
+        -:   27:// Please use C89 style variable declarations in this file because VS 2010
+        -:   28://========================================================================
+        -:   29:
+        -:   30:#include "internal.h"
+        -:   31:
+        -:   32:#include <assert.h>
+        -:   33:#include <stdio.h>
+        -:   34:#include <string.h>
+        -:   35:#include <limits.h>
+        -:   36:#include <stdio.h>
+        -:   37:
+        -:   38:
+        -:   39://////////////////////////////////////////////////////////////////////////
+        -:   40://////                       GLFW internal API                      //////
+        -:   41://////////////////////////////////////////////////////////////////////////
+        -:   42:
+        -:   43:// Checks whether the desired context attributes are valid
+        -:   44://
+        -:   45:// This function checks things like whether the specified client API version
+        -:   46:// exists and whether all relevant options have supported and non-conflicting
+        -:   47:// values
+        -:   48://
+        1:   49:GLFWbool _glfwIsValidContextConfig(const _GLFWctxconfig* ctxconfig)
+        -:   50:{
+        1:   51:    if (ctxconfig->share)
+        1:   51-block  0
+        -:   52:    {
+    #####:   53:        if (ctxconfig->client == GLFW_NO_API ||
+    %%%%%:   53-block  0
+    #####:   54:            ctxconfig->share->context.client == GLFW_NO_API)
+    %%%%%:   54-block  0
+        -:   55:        {
+    #####:   56:            _glfwInputError(GLFW_NO_WINDOW_CONTEXT, NULL);
+    %%%%%:   56-block  0
+    #####:   57:            return GLFW_FALSE;
+        -:   58:        }
+        -:   59:    }
+        -:   60:
+       1*:   61:    if (ctxconfig->source != GLFW_NATIVE_CONTEXT_API &&
+        1:   61-block  0
+    #####:   62:        ctxconfig->source != GLFW_EGL_CONTEXT_API &&
+    %%%%%:   62-block  0
+    #####:   63:        ctxconfig->source != GLFW_OSMESA_CONTEXT_API)
+    %%%%%:   63-block  0
+        -:   64:    {
+    #####:   65:        _glfwInputError(GLFW_INVALID_ENUM,
+    %%%%%:   65-block  0
+        -:   66:                        "Invalid context creation API 0x%08X",
+        -:   67:                        ctxconfig->source);
+    #####:   68:        return GLFW_FALSE;
+        -:   69:    }
+        -:   70:
+        1:   71:    if (ctxconfig->client != GLFW_NO_API &&
+        1:   71-block  0
+       1*:   72:        ctxconfig->client != GLFW_OPENGL_API &&
+        1:   72-block  0
+    #####:   73:        ctxconfig->client != GLFW_OPENGL_ES_API)
+    %%%%%:   73-block  0
+        -:   74:    {
+    #####:   75:        _glfwInputError(GLFW_INVALID_ENUM,
+    %%%%%:   75-block  0
+        -:   76:                        "Invalid client API 0x%08X",
+        -:   77:                        ctxconfig->client);
+    #####:   78:        return GLFW_FALSE;
+        -:   79:    }
+        -:   80:
+        1:   81:    if (ctxconfig->client == GLFW_OPENGL_API)
+        1:   81-block  0
+        -:   82:    {
+        1:   83:        if ((ctxconfig->major < 1 || ctxconfig->minor < 0) ||
+        1:   83-block  0
+        1:   83-block  1
+       1*:   84:            (ctxconfig->major == 1 && ctxconfig->minor > 5) ||
+        1:   84-block  0
+    %%%%%:   84-block  1
+       1*:   85:            (ctxconfig->major == 2 && ctxconfig->minor > 1) ||
+        1:   85-block  0
+    %%%%%:   85-block  1
+       1*:   86:            (ctxconfig->major == 3 && ctxconfig->minor > 3))
+        1:   86-block  0
+    %%%%%:   86-block  1
+        -:   87:        {
+        -:   88:            // OpenGL 1.0 is the smallest valid version
+        -:   89:            // OpenGL 1.x series ended with version 1.5
+        -:   90:            // OpenGL 2.x series ended with version 2.1
+        -:   91:            // OpenGL 3.x series ended with version 3.3
+        -:   92:            // For now, let everything else through
+        -:   93:
+    #####:   94:            _glfwInputError(GLFW_INVALID_VALUE,
+    %%%%%:   94-block  0
+        -:   95:                            "Invalid OpenGL version %i.%i",
+        -:   96:                            ctxconfig->major, ctxconfig->minor);
+    #####:   97:            return GLFW_FALSE;
+        -:   98:        }
+        -:   99:
+        1:  100:        if (ctxconfig->profile)
+        1:  100-block  0
+        -:  101:        {
+       1*:  102:            if (ctxconfig->profile != GLFW_OPENGL_CORE_PROFILE &&
+        1:  102-block  0
+    #####:  103:                ctxconfig->profile != GLFW_OPENGL_COMPAT_PROFILE)
+    %%%%%:  103-block  0
+        -:  104:            {
+    #####:  105:                _glfwInputError(GLFW_INVALID_ENUM,
+    %%%%%:  105-block  0
+        -:  106:                                "Invalid OpenGL profile 0x%08X",
+        -:  107:                                ctxconfig->profile);
+    #####:  108:                return GLFW_FALSE;
+        -:  109:            }
+        -:  110:
+        1:  111:            if (ctxconfig->major <= 2 ||
+        1:  111-block  0
+       1*:  112:                (ctxconfig->major == 3 && ctxconfig->minor < 2))
+        1:  112-block  0
+    %%%%%:  112-block  1
+        -:  113:            {
+        -:  114:                // Desktop OpenGL context profiles are only defined for version 3.2
+        -:  115:                // and above
+        -:  116:
+    #####:  117:                _glfwInputError(GLFW_INVALID_VALUE,
+    %%%%%:  117-block  0
+        -:  118:                                "Context profiles are only defined for OpenGL version 3.2 and above");
+    #####:  119:                return GLFW_FALSE;
+        -:  120:            }
+        -:  121:        }
+        -:  122:
+       1*:  123:        if (ctxconfig->forward && ctxconfig->major <= 2)
+        1:  123-block  0
+    %%%%%:  123-block  1
+        -:  124:        {
+        -:  125:            // Forward-compatible contexts are only defined for OpenGL version 3.0 and above
+    #####:  126:            _glfwInputError(GLFW_INVALID_VALUE,
+    %%%%%:  126-block  0
+        -:  127:                            "Forward-compatibility is only defined for OpenGL version 3.0 and above");
+    #####:  128:            return GLFW_FALSE;
+        -:  129:        }
+        -:  130:    }
+    #####:  131:    else if (ctxconfig->client == GLFW_OPENGL_ES_API)
+    %%%%%:  131-block  0
+        -:  132:    {
+    #####:  133:        if (ctxconfig->major < 1 || ctxconfig->minor < 0 ||
+    %%%%%:  133-block  0
+    %%%%%:  133-block  1
+    #####:  134:            (ctxconfig->major == 1 && ctxconfig->minor > 1) ||
+    %%%%%:  134-block  0
+    %%%%%:  134-block  1
+    #####:  135:            (ctxconfig->major == 2 && ctxconfig->minor > 0))
+    %%%%%:  135-block  0
+    %%%%%:  135-block  1
+        -:  136:        {
+        -:  137:            // OpenGL ES 1.0 is the smallest valid version
+        -:  138:            // OpenGL ES 1.x series ended with version 1.1
+        -:  139:            // OpenGL ES 2.x series ended with version 2.0
+        -:  140:            // For now, let everything else through
+        -:  141:
+    #####:  142:            _glfwInputError(GLFW_INVALID_VALUE,
+    %%%%%:  142-block  0
+        -:  143:                            "Invalid OpenGL ES version %i.%i",
+        -:  144:                            ctxconfig->major, ctxconfig->minor);
+    #####:  145:            return GLFW_FALSE;
+        -:  146:        }
+        -:  147:    }
+        -:  148:
+        1:  149:    if (ctxconfig->robustness)
+        1:  149-block  0
+        -:  150:    {
+    #####:  151:        if (ctxconfig->robustness != GLFW_NO_RESET_NOTIFICATION &&
+    %%%%%:  151-block  0
+    #####:  152:            ctxconfig->robustness != GLFW_LOSE_CONTEXT_ON_RESET)
+    %%%%%:  152-block  0
+        -:  153:        {
+    #####:  154:            _glfwInputError(GLFW_INVALID_ENUM,
+    %%%%%:  154-block  0
+        -:  155:                            "Invalid context robustness mode 0x%08X",
+        -:  156:                            ctxconfig->robustness);
+    #####:  157:            return GLFW_FALSE;
+        -:  158:        }
+        -:  159:    }
+        -:  160:
+        1:  161:    if (ctxconfig->release)
+        1:  161-block  0
+        -:  162:    {
+    #####:  163:        if (ctxconfig->release != GLFW_RELEASE_BEHAVIOR_NONE &&
+    %%%%%:  163-block  0
+    #####:  164:            ctxconfig->release != GLFW_RELEASE_BEHAVIOR_FLUSH)
+    %%%%%:  164-block  0
+        -:  165:        {
+    #####:  166:            _glfwInputError(GLFW_INVALID_ENUM,
+    %%%%%:  166-block  0
+        -:  167:                            "Invalid context release behavior 0x%08X",
+        -:  168:                            ctxconfig->release);
+    #####:  169:            return GLFW_FALSE;
+        -:  170:        }
+        -:  171:    }
+        -:  172:
+        1:  173:    return GLFW_TRUE;
+        1:  173-block  0
+        -:  174:}
+        -:  175:
+        -:  176:// Chooses the framebuffer config that best matches the desired one
+        -:  177://
+        2:  178:const _GLFWfbconfig* _glfwChooseFBConfig(const _GLFWfbconfig* desired,
+        -:  179:                                         const _GLFWfbconfig* alternatives,
+        -:  180:                                         unsigned int count)
+        -:  181:{
+        -:  182:    unsigned int i;
+        2:  183:    unsigned int missing, leastMissing = UINT_MAX;
+        2:  184:    unsigned int colorDiff, leastColorDiff = UINT_MAX;
+        2:  185:    unsigned int extraDiff, leastExtraDiff = UINT_MAX;
+        -:  186:    const _GLFWfbconfig* current;
+        2:  187:    const _GLFWfbconfig* closest = NULL;
+        -:  188:
+     1010:  189:    for (i = 0;  i < count;  i++)
+        2:  189-block  0
+     1008:  189-block  1
+     1010:  189-block  2
+        -:  190:    {
+     1008:  191:        current = alternatives + i;
+        -:  192:
+    1008*:  193:        if (desired->stereo > 0 && current->stereo == 0)
+     1008:  193-block  0
+    %%%%%:  193-block  1
+        -:  194:        {
+        -:  195:            // Stereo is a hard constraint
+    #####:  196:            continue;
+    %%%%%:  196-block  0
+        -:  197:        }
+        -:  198:
+     1008:  199:        if (desired->doublebuffer != current->doublebuffer)
+     1008:  199-block  0
+        -:  200:        {
+        -:  201:            // Double buffering is a hard constraint
+      336:  202:            continue;
+      336:  202-block  0
+        -:  203:        }
+        -:  204:
+        -:  205:        // Count number of missing buffers
+        -:  206:        {
+      672:  207:            missing = 0;
+        -:  208:
+      672:  209:            if (desired->alphaBits > 0 && current->alphaBits == 0)
+      672:  209-block  0
+      672:  209-block  1
+      320:  210:                missing++;
+      320:  210-block  0
+        -:  211:
+      672:  212:            if (desired->depthBits > 0 && current->depthBits == 0)
+      672:  212-block  0
+      672:  212-block  1
+      168:  213:                missing++;
+      168:  213-block  0
+        -:  214:
+      672:  215:            if (desired->stencilBits > 0 && current->stencilBits == 0)
+      672:  215-block  0
+      672:  215-block  1
+      504:  216:                missing++;
+      504:  216-block  0
+        -:  217:
+     672*:  218:            if (desired->auxBuffers > 0 &&
+      672:  218-block  0
+    #####:  219:                current->auxBuffers < desired->auxBuffers)
+    %%%%%:  219-block  0
+        -:  220:            {
+    #####:  221:                missing += desired->auxBuffers - current->auxBuffers;
+    %%%%%:  221-block  0
+        -:  222:            }
+        -:  223:
+     672*:  224:            if (desired->samples > 0 && current->samples == 0)
+      672:  224-block  0
+    %%%%%:  224-block  1
+        -:  225:            {
+        -:  226:                // Technically, several multisampling buffers could be
+        -:  227:                // involved, but that's a lower level implementation detail and
+        -:  228:                // not important to us here, so we count them as one
+    #####:  229:                missing++;
+    %%%%%:  229-block  0
+        -:  230:            }
+        -:  231:
+      672:  232:            if (desired->transparent != current->transparent)
+      672:  232-block  0
+    #####:  233:                missing++;
+    %%%%%:  233-block  0
+        -:  234:        }
+        -:  235:
+        -:  236:        // These polynomials make many small channel size differences matter
+        -:  237:        // less than one large channel size difference
+        -:  238:
+        -:  239:        // Calculate color channel size difference value
+        -:  240:        {
+      672:  241:            colorDiff = 0;
+        -:  242:
+      672:  243:            if (desired->redBits != GLFW_DONT_CARE)
+      672:  243-block  0
+        -:  244:            {
+      672:  245:                colorDiff += (desired->redBits - current->redBits) *
+      672:  246:                             (desired->redBits - current->redBits);
+      672:  246-block  0
+        -:  247:            }
+        -:  248:
+      672:  249:            if (desired->greenBits != GLFW_DONT_CARE)
+      672:  249-block  0
+        -:  250:            {
+      672:  251:                colorDiff += (desired->greenBits - current->greenBits) *
+      672:  252:                             (desired->greenBits - current->greenBits);
+      672:  252-block  0
+        -:  253:            }
+        -:  254:
+      672:  255:            if (desired->blueBits != GLFW_DONT_CARE)
+      672:  255-block  0
+        -:  256:            {
+      672:  257:                colorDiff += (desired->blueBits - current->blueBits) *
+      672:  258:                             (desired->blueBits - current->blueBits);
+      672:  258-block  0
+        -:  259:            }
+        -:  260:        }
+        -:  261:
+        -:  262:        // Calculate non-color channel size difference value
+        -:  263:        {
+      672:  264:            extraDiff = 0;
+        -:  265:
+      672:  266:            if (desired->alphaBits != GLFW_DONT_CARE)
+      672:  266-block  0
+        -:  267:            {
+      672:  268:                extraDiff += (desired->alphaBits - current->alphaBits) *
+      672:  269:                             (desired->alphaBits - current->alphaBits);
+      672:  269-block  0
+        -:  270:            }
+        -:  271:
+      672:  272:            if (desired->depthBits != GLFW_DONT_CARE)
+      672:  272-block  0
+        -:  273:            {
+      672:  274:                extraDiff += (desired->depthBits - current->depthBits) *
+      672:  275:                             (desired->depthBits - current->depthBits);
+      672:  275-block  0
+        -:  276:            }
+        -:  277:
+      672:  278:            if (desired->stencilBits != GLFW_DONT_CARE)
+      672:  278-block  0
+        -:  279:            {
+      672:  280:                extraDiff += (desired->stencilBits - current->stencilBits) *
+      672:  281:                             (desired->stencilBits - current->stencilBits);
+      672:  281-block  0
+        -:  282:            }
+        -:  283:
+      672:  284:            if (desired->accumRedBits != GLFW_DONT_CARE)
+      672:  284-block  0
+        -:  285:            {
+      672:  286:                extraDiff += (desired->accumRedBits - current->accumRedBits) *
+      672:  287:                             (desired->accumRedBits - current->accumRedBits);
+      672:  287-block  0
+        -:  288:            }
+        -:  289:
+      672:  290:            if (desired->accumGreenBits != GLFW_DONT_CARE)
+      672:  290-block  0
+        -:  291:            {
+      672:  292:                extraDiff += (desired->accumGreenBits - current->accumGreenBits) *
+      672:  293:                             (desired->accumGreenBits - current->accumGreenBits);
+      672:  293-block  0
+        -:  294:            }
+        -:  295:
+      672:  296:            if (desired->accumBlueBits != GLFW_DONT_CARE)
+      672:  296-block  0
+        -:  297:            {
+      672:  298:                extraDiff += (desired->accumBlueBits - current->accumBlueBits) *
+      672:  299:                             (desired->accumBlueBits - current->accumBlueBits);
+      672:  299-block  0
+        -:  300:            }
+        -:  301:
+      672:  302:            if (desired->accumAlphaBits != GLFW_DONT_CARE)
+      672:  302-block  0
+        -:  303:            {
+      672:  304:                extraDiff += (desired->accumAlphaBits - current->accumAlphaBits) *
+      672:  305:                             (desired->accumAlphaBits - current->accumAlphaBits);
+      672:  305-block  0
+        -:  306:            }
+        -:  307:
+      672:  308:            if (desired->samples != GLFW_DONT_CARE)
+      672:  308-block  0
+        -:  309:            {
+      672:  310:                extraDiff += (desired->samples - current->samples) *
+      672:  311:                             (desired->samples - current->samples);
+      672:  311-block  0
+        -:  312:            }
+        -:  313:
+     672*:  314:            if (desired->sRGB && !current->sRGB)
+      672:  314-block  0
+    %%%%%:  314-block  1
+    #####:  315:                extraDiff++;
+    %%%%%:  315-block  0
+        -:  316:        }
+        -:  317:
+        -:  318:        // Figure out if the current one is better than the best one found so far
+        -:  319:        // Least number of missing buffers is the most important heuristic,
+        -:  320:        // then color buffer size match and lastly size match for other buffers
+        -:  321:
+      672:  322:        if (missing < leastMissing)
+      672:  322-block  0
+        6:  323:            closest = current;
+        6:  323-block  0
+      666:  324:        else if (missing == leastMissing)
+      666:  324-block  0
+        -:  325:        {
+      106:  326:            if ((colorDiff < leastColorDiff) ||
+      106:  326-block  0
+      106:  326-block  1
+      106:  327:                (colorDiff == leastColorDiff && extraDiff < leastExtraDiff))
+      106:  327-block  0
+        -:  328:            {
+        2:  329:                closest = current;
+        2:  329-block  0
+        -:  330:            }
+        -:  331:        }
+        -:  332:
+      672:  333:        if (current == closest)
+      672:  333-block  0
+        -:  334:        {
+        8:  335:            leastMissing = missing;
+        8:  336:            leastColorDiff = colorDiff;
+        8:  337:            leastExtraDiff = extraDiff;
+        8:  337-block  0
+        -:  338:        }
+        -:  339:    }
+        -:  340:
+        2:  341:    return closest;
+        2:  341-block  0
+        -:  342:}
+        -:  343:
+        -:  344:// Retrieves the attributes of the current context
+        -:  345://
+        1:  346:GLFWbool _glfwRefreshContextAttribs(_GLFWwindow* window,
+        -:  347:                                    const _GLFWctxconfig* ctxconfig)
+        -:  348:{
+        -:  349:    int i;
+        -:  350:    _GLFWwindow* previous;
+        -:  351:    const char* version;
+        1:  352:    const char* prefixes[] =
+        -:  353:    {
+        -:  354:        "OpenGL ES-CM ",
+        -:  355:        "OpenGL ES-CL ",
+        -:  356:        "OpenGL ES ",
+        -:  357:        NULL
+        -:  358:    };
+        -:  359:
+        1:  360:    window->context.source = ctxconfig->source;
+        1:  361:    window->context.client = GLFW_OPENGL_API;
+        -:  362:
+        1:  363:    previous = _glfwPlatformGetTls(&_glfw.contextSlot);
+        1:  363-block  0
+        1:  364:    glfwMakeContextCurrent((GLFWwindow*) window);
+        -:  365:
+        1:  366:    window->context.GetIntegerv = (PFNGLGETINTEGERVPROC)
+        1:  367:        window->context.getProcAddress("glGetIntegerv");
+        1:  368:    window->context.GetString = (PFNGLGETSTRINGPROC)
+        1:  369:        window->context.getProcAddress("glGetString");
+        1:  370:    if (!window->context.GetIntegerv || !window->context.GetString)
+        1:  370-block  0
+        -:  371:    {
+    #####:  372:        _glfwInputError(GLFW_PLATFORM_ERROR, "Entry point retrieval is broken");
+    %%%%%:  372-block  0
+    #####:  373:        glfwMakeContextCurrent((GLFWwindow*) previous);
+    #####:  374:        return GLFW_FALSE;
+        -:  375:    }
+        -:  376:
+        1:  377:    version = (const char*) window->context.GetString(GL_VERSION);
+        1:  377-block  0
+        1:  378:    if (!version)
+        -:  379:    {
+    #####:  380:        if (ctxconfig->client == GLFW_OPENGL_API)
+    %%%%%:  380-block  0
+        -:  381:        {
+    #####:  382:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  382-block  0
+        -:  383:                            "OpenGL version string retrieval is broken");
+        -:  384:        }
+        -:  385:        else
+        -:  386:        {
+    #####:  387:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  387-block  0
+        -:  388:                            "OpenGL ES version string retrieval is broken");
+        -:  389:        }
+        -:  390:
+    #####:  391:        glfwMakeContextCurrent((GLFWwindow*) previous);
+    %%%%%:  391-block  0
+    #####:  392:        return GLFW_FALSE;
+        -:  393:    }
+        -:  394:
+        4:  395:    for (i = 0;  prefixes[i];  i++)
+        1:  395-block  0
+        3:  395-block  1
+        4:  395-block  2
+        -:  396:    {
+        3:  397:        const size_t length = strlen(prefixes[i]);
+        -:  398:
+        3:  399:        if (strncmp(version, prefixes[i], length) == 0)
+        3:  399-block  0
+        -:  400:        {
+    #####:  401:            version += length;
+    #####:  402:            window->context.client = GLFW_OPENGL_ES_API;
+    #####:  403:            break;
+    %%%%%:  403-block  0
+        -:  404:        }
+        -:  405:    }
+        -:  406:
+        1:  407:    if (!sscanf(version, "%d.%d.%d",
+        1:  407-block  0
+        -:  408:                &window->context.major,
+        -:  409:                &window->context.minor,
+        -:  410:                &window->context.revision))
+        -:  411:    {
+    #####:  412:        if (window->context.client == GLFW_OPENGL_API)
+    %%%%%:  412-block  0
+        -:  413:        {
+    #####:  414:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  414-block  0
+        -:  415:                            "No version found in OpenGL version string");
+        -:  416:        }
+        -:  417:        else
+        -:  418:        {
+    #####:  419:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  419-block  0
+        -:  420:                            "No version found in OpenGL ES version string");
+        -:  421:        }
+        -:  422:
+    #####:  423:        glfwMakeContextCurrent((GLFWwindow*) previous);
+    %%%%%:  423-block  0
+    #####:  424:        return GLFW_FALSE;
+        -:  425:    }
+        -:  426:
+        1:  427:    if (window->context.major < ctxconfig->major ||
+        1:  427-block  0
+        1:  428:        (window->context.major == ctxconfig->major &&
+        1:  428-block  0
+        1:  429:         window->context.minor < ctxconfig->minor))
+        1:  429-block  0
+        -:  430:    {
+        -:  431:        // The desired OpenGL version is greater than the actual version
+        -:  432:        // This only happens if the machine lacks {GLX|WGL}_ARB_create_context
+        -:  433:        // /and/ the user has requested an OpenGL version greater than 1.0
+        -:  434:
+        -:  435:        // For API consistency, we emulate the behavior of the
+        -:  436:        // {GLX|WGL}_ARB_create_context extension and fail here
+        -:  437:
+    #####:  438:        if (window->context.client == GLFW_OPENGL_API)
+    %%%%%:  438-block  0
+        -:  439:        {
+    #####:  440:            _glfwInputError(GLFW_VERSION_UNAVAILABLE,
+    %%%%%:  440-block  0
+        -:  441:                            "Requested OpenGL version %i.%i, got version %i.%i",
+        -:  442:                            ctxconfig->major, ctxconfig->minor,
+        -:  443:                            window->context.major, window->context.minor);
+        -:  444:        }
+        -:  445:        else
+        -:  446:        {
+    #####:  447:            _glfwInputError(GLFW_VERSION_UNAVAILABLE,
+    %%%%%:  447-block  0
+        -:  448:                            "Requested OpenGL ES version %i.%i, got version %i.%i",
+        -:  449:                            ctxconfig->major, ctxconfig->minor,
+        -:  450:                            window->context.major, window->context.minor);
+        -:  451:        }
+        -:  452:
+    #####:  453:        glfwMakeContextCurrent((GLFWwindow*) previous);
+    %%%%%:  453-block  0
+    #####:  454:        return GLFW_FALSE;
+        -:  455:    }
+        -:  456:
+        1:  457:    if (window->context.major >= 3)
+        1:  457-block  0
+        -:  458:    {
+        -:  459:        // OpenGL 3.0+ uses a different function for extension string retrieval
+        -:  460:        // We cache it here instead of in glfwExtensionSupported mostly to alert
+        -:  461:        // users as early as possible that their build may be broken
+        -:  462:
+        1:  463:        window->context.GetStringi = (PFNGLGETSTRINGIPROC)
+        1:  464:            window->context.getProcAddress("glGetStringi");
+        1:  464-block  0
+        1:  465:        if (!window->context.GetStringi)
+        -:  466:        {
+    #####:  467:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  467-block  0
+        -:  468:                            "Entry point retrieval is broken");
+    #####:  469:            glfwMakeContextCurrent((GLFWwindow*) previous);
+    #####:  470:            return GLFW_FALSE;
+        -:  471:        }
+        -:  472:    }
+        -:  473:
+        1:  474:    if (window->context.client == GLFW_OPENGL_API)
+        1:  474-block  0
+        -:  475:    {
+        -:  476:        // Read back context flags (OpenGL 3.0 and above)
+        1:  477:        if (window->context.major >= 3)
+        1:  477-block  0
+        -:  478:        {
+        -:  479:            GLint flags;
+        1:  480:            window->context.GetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        1:  480-block  0
+        -:  481:
+        1:  482:            if (flags & GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT)
+    #####:  483:                window->context.forward = GLFW_TRUE;
+    %%%%%:  483-block  0
+        -:  484:
+        1:  485:            if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+        1:  485-block  0
+    #####:  486:                window->context.debug = GLFW_TRUE;
+    %%%%%:  486-block  0
+        1:  487:            else if (glfwExtensionSupported("GL_ARB_debug_output") &&
+        1:  487-block  0
+        1:  488:                     ctxconfig->debug)
+        1:  488-block  0
+        -:  489:            {
+        -:  490:                // HACK: This is a workaround for older drivers (pre KHR_debug)
+        -:  491:                //       not setting the debug bit in the context flags for
+        -:  492:                //       debug contexts
+    #####:  493:                window->context.debug = GLFW_TRUE;
+    %%%%%:  493-block  0
+        -:  494:            }
+        -:  495:
+        1:  496:            if (flags & GL_CONTEXT_FLAG_NO_ERROR_BIT_KHR)
+        1:  496-block  0
+    #####:  497:                window->context.noerror = GLFW_TRUE;
+    %%%%%:  497-block  0
+        -:  498:        }
+        -:  499:
+        -:  500:        // Read back OpenGL context profile (OpenGL 3.2 and above)
+       1*:  501:        if (window->context.major >= 4 ||
+        1:  501-block  0
+    #####:  502:            (window->context.major == 3 && window->context.minor >= 2))
+    %%%%%:  502-block  0
+    %%%%%:  502-block  1
+        -:  503:        {
+        -:  504:            GLint mask;
+        1:  505:            window->context.GetIntegerv(GL_CONTEXT_PROFILE_MASK, &mask);
+        1:  505-block  0
+        -:  506:
+        1:  507:            if (mask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT)
+    #####:  508:                window->context.profile = GLFW_OPENGL_COMPAT_PROFILE;
+    %%%%%:  508-block  0
+        1:  509:            else if (mask & GL_CONTEXT_CORE_PROFILE_BIT)
+        1:  509-block  0
+        1:  510:                window->context.profile = GLFW_OPENGL_CORE_PROFILE;
+        1:  510-block  0
+    #####:  511:            else if (glfwExtensionSupported("GL_ARB_compatibility"))
+    %%%%%:  511-block  0
+        -:  512:            {
+        -:  513:                // HACK: This is a workaround for the compatibility profile bit
+        -:  514:                //       not being set in the context flags if an OpenGL 3.2+
+        -:  515:                //       context was created without having requested a specific
+        -:  516:                //       version
+    #####:  517:                window->context.profile = GLFW_OPENGL_COMPAT_PROFILE;
+    %%%%%:  517-block  0
+        -:  518:            }
+        -:  519:        }
+        -:  520:
+        -:  521:        // Read back robustness strategy
+        1:  522:        if (glfwExtensionSupported("GL_ARB_robustness"))
+        1:  522-block  0
+        -:  523:        {
+        -:  524:            // NOTE: We avoid using the context flags for detection, as they are
+        -:  525:            //       only present from 3.0 while the extension applies from 1.1
+        -:  526:
+        -:  527:            GLint strategy;
+        1:  528:            window->context.GetIntegerv(GL_RESET_NOTIFICATION_STRATEGY_ARB,
+        1:  528-block  0
+        -:  529:                                        &strategy);
+        -:  530:
+        1:  531:            if (strategy == GL_LOSE_CONTEXT_ON_RESET_ARB)
+    #####:  532:                window->context.robustness = GLFW_LOSE_CONTEXT_ON_RESET;
+    %%%%%:  532-block  0
+        1:  533:            else if (strategy == GL_NO_RESET_NOTIFICATION_ARB)
+        1:  533-block  0
+        1:  534:                window->context.robustness = GLFW_NO_RESET_NOTIFICATION;
+        1:  534-block  0
+        -:  535:        }
+        -:  536:    }
+        -:  537:    else
+        -:  538:    {
+        -:  539:        // Read back robustness strategy
+    #####:  540:        if (glfwExtensionSupported("GL_EXT_robustness"))
+    %%%%%:  540-block  0
+        -:  541:        {
+        -:  542:            // NOTE: The values of these constants match those of the OpenGL ARB
+        -:  543:            //       one, so we can reuse them here
+        -:  544:
+        -:  545:            GLint strategy;
+    #####:  546:            window->context.GetIntegerv(GL_RESET_NOTIFICATION_STRATEGY_ARB,
+    %%%%%:  546-block  0
+        -:  547:                                        &strategy);
+        -:  548:
+    #####:  549:            if (strategy == GL_LOSE_CONTEXT_ON_RESET_ARB)
+    #####:  550:                window->context.robustness = GLFW_LOSE_CONTEXT_ON_RESET;
+    %%%%%:  550-block  0
+    #####:  551:            else if (strategy == GL_NO_RESET_NOTIFICATION_ARB)
+    %%%%%:  551-block  0
+    #####:  552:                window->context.robustness = GLFW_NO_RESET_NOTIFICATION;
+    %%%%%:  552-block  0
+        -:  553:        }
+        -:  554:    }
+        -:  555:
+        1:  556:    if (glfwExtensionSupported("GL_KHR_context_flush_control"))
+        1:  556-block  0
+        -:  557:    {
+        -:  558:        GLint behavior;
+        1:  559:        window->context.GetIntegerv(GL_CONTEXT_RELEASE_BEHAVIOR, &behavior);
+        1:  559-block  0
+        -:  560:
+        1:  561:        if (behavior == GL_NONE)
+    #####:  562:            window->context.release = GLFW_RELEASE_BEHAVIOR_NONE;
+    %%%%%:  562-block  0
+        1:  563:        else if (behavior == GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH)
+        1:  563-block  0
+        1:  564:            window->context.release = GLFW_RELEASE_BEHAVIOR_FLUSH;
+        1:  564-block  0
+        -:  565:    }
+        -:  566:
+        -:  567:    // Clearing the front buffer to black to avoid garbage pixels left over from
+        -:  568:    // previous uses of our bit of VRAM
+        -:  569:    {
+        -:  570:        PFNGLCLEARPROC glClear = (PFNGLCLEARPROC)
+        1:  571:            window->context.getProcAddress("glClear");
+        1:  571-block  0
+        1:  572:        glClear(GL_COLOR_BUFFER_BIT);
+        1:  573:        window->context.swapBuffers(window);
+        -:  574:    }
+        -:  575:
+        1:  576:    glfwMakeContextCurrent((GLFWwindow*) previous);
+        1:  577:    return GLFW_TRUE;
+        -:  578:}
+        -:  579:
+        -:  580:// Searches an extension string for the specified extension
+        -:  581://
+       12:  582:GLFWbool _glfwStringInExtensionString(const char* string, const char* extensions)
+        -:  583:{
+       12:  584:    const char* start = extensions;
+       12:  584-block  0
+        -:  585:
+        -:  586:    for (;;)
+    #####:  587:    {
+        -:  588:        const char* where;
+        -:  589:        const char* terminator;
+        -:  590:
+       12:  591:        where = strstr(start, string);
+       12:  592:        if (!where)
+       12:  592-block  0
+        2:  593:            return GLFW_FALSE;
+        2:  593-block  0
+        -:  594:
+       10:  595:        terminator = where + strlen(string);
+       10:  596:        if (where == start || *(where - 1) == ' ')
+       10:  596-block  0
+        9:  596-block  1
+        -:  597:        {
+      10*:  598:            if (*terminator == ' ' || *terminator == '\0')
+       10:  598-block  0
+    %%%%%:  598-block  1
+        -:  599:                break;
+        -:  600:        }
+        -:  601:
+    #####:  602:        start = terminator;
+    %%%%%:  602-block  0
+        -:  603:    }
+        -:  604:
+       10:  605:    return GLFW_TRUE;
+       10:  605-block  0
+        -:  606:}
+        -:  607:
+        -:  608:
+        -:  609://////////////////////////////////////////////////////////////////////////
+        -:  610://////                        GLFW public API                       //////
+        -:  611://////////////////////////////////////////////////////////////////////////
+        -:  612:
+        3:  613:GLFWAPI void glfwMakeContextCurrent(GLFWwindow* handle)
+        -:  614:{
+        3:  615:    _GLFWwindow* window = (_GLFWwindow*) handle;
+        3:  616:    _GLFWwindow* previous = _glfwPlatformGetTls(&_glfw.contextSlot);
+        3:  616-block  0
+        -:  617:
+       3*:  618:    _GLFW_REQUIRE_INIT();
+    %%%%%:  618-block  0
+        -:  619:
+        3:  620:    if (window && window->context.client == GLFW_NO_API)
+        3:  620-block  0
+        2:  620-block  1
+        -:  621:    {
+    #####:  622:        _glfwInputError(GLFW_NO_WINDOW_CONTEXT,
+    %%%%%:  622-block  0
+        -:  623:                        "Cannot make current with a window that has no OpenGL or OpenGL ES context");
+    #####:  624:        return;
+        -:  625:    }
+        -:  626:
+        3:  627:    if (previous)
+        3:  627-block  0
+        -:  628:    {
+       1*:  629:        if (!window || window->context.source != previous->context.source)
+        1:  629-block  0
+    %%%%%:  629-block  1
+        1:  630:            previous->context.makeCurrent(NULL);
+        1:  630-block  0
+        -:  631:    }
+        -:  632:
+        3:  633:    if (window)
+        3:  633-block  0
+        2:  634:        window->context.makeCurrent(window);
+        2:  634-block  0
+        -:  635:}
+        -:  636:
+    #####:  637:GLFWAPI GLFWwindow* glfwGetCurrentContext(void)
+        -:  638:{
+    #####:  639:    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+    %%%%%:  639-block  0
+    %%%%%:  639-block  1
+    #####:  640:    return _glfwPlatformGetTls(&_glfw.contextSlot);
+    %%%%%:  640-block  0
+        -:  641:}
+        -:  642:
+      515:  643:GLFWAPI void glfwSwapBuffers(GLFWwindow* handle)
+        -:  644:{
+      515:  645:    _GLFWwindow* window = (_GLFWwindow*) handle;
+     515*:  646:    assert(window != NULL);
+      515:  646-block  0
+    %%%%%:  646-block  1
+        -:  647:
+     515*:  648:    _GLFW_REQUIRE_INIT();
+      515:  648-block  0
+    %%%%%:  648-block  1
+        -:  649:
+      515:  650:    if (window->context.client == GLFW_NO_API)
+      515:  650-block  0
+        -:  651:    {
+    #####:  652:        _glfwInputError(GLFW_NO_WINDOW_CONTEXT,
+    %%%%%:  652-block  0
+        -:  653:                        "Cannot swap buffers of a window that has no OpenGL or OpenGL ES context");
+    #####:  654:        return;
+        -:  655:    }
+        -:  656:
+      515:  657:    window->context.swapBuffers(window);
+      515:  657-block  0
+        -:  658:}
+        -:  659:
+    #####:  660:GLFWAPI void glfwSwapInterval(int interval)
+        -:  661:{
+        -:  662:    _GLFWwindow* window;
+        -:  663:
+    #####:  664:    _GLFW_REQUIRE_INIT();
+    %%%%%:  664-block  0
+    %%%%%:  664-block  1
+        -:  665:
+    #####:  666:    window = _glfwPlatformGetTls(&_glfw.contextSlot);
+    %%%%%:  666-block  0
+    #####:  667:    if (!window)
+        -:  668:    {
+    #####:  669:        _glfwInputError(GLFW_NO_CURRENT_CONTEXT,
+    %%%%%:  669-block  0
+        -:  670:                        "Cannot set swap interval without a current OpenGL or OpenGL ES context");
+    #####:  671:        return;
+        -:  672:    }
+        -:  673:
+    #####:  674:    window->context.swapInterval(interval);
+    %%%%%:  674-block  0
+        -:  675:}
+        -:  676:
+        3:  677:GLFWAPI int glfwExtensionSupported(const char* extension)
+        -:  678:{
+        -:  679:    _GLFWwindow* window;
+       3*:  680:    assert(extension != NULL);
+        3:  680-block  0
+    %%%%%:  680-block  1
+        -:  681:
+       3*:  682:    _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
+        3:  682-block  0
+    %%%%%:  682-block  1
+        -:  683:
+        3:  684:    window = _glfwPlatformGetTls(&_glfw.contextSlot);
+        3:  684-block  0
+        3:  685:    if (!window)
+        -:  686:    {
+    #####:  687:        _glfwInputError(GLFW_NO_CURRENT_CONTEXT,
+    %%%%%:  687-block  0
+        -:  688:                        "Cannot query extension without a current OpenGL or OpenGL ES context");
+    #####:  689:        return GLFW_FALSE;
+        -:  690:    }
+        -:  691:
+        3:  692:    if (*extension == '\0')
+        3:  692-block  0
+        -:  693:    {
+    #####:  694:        _glfwInputError(GLFW_INVALID_VALUE, "Extension name cannot be an empty string");
+    %%%%%:  694-block  0
+    #####:  695:        return GLFW_FALSE;
+        -:  696:    }
+        -:  697:
+        3:  698:    if (window->context.major >= 3)
+        3:  698-block  0
+        -:  699:    {
+        -:  700:        int i;
+        -:  701:        GLint count;
+        -:  702:
+        -:  703:        // Check if extension is in the modern OpenGL extensions string list
+        -:  704:
+        3:  705:        window->context.GetIntegerv(GL_NUM_EXTENSIONS, &count);
+        3:  705-block  0
+        -:  706:
+      326:  707:        for (i = 0;  i < count;  i++)
+      323:  707-block  0
+      326:  707-block  1
+        -:  708:        {
+        -:  709:            const char* en = (const char*)
+      326:  710:                window->context.GetStringi(GL_EXTENSIONS, i);
+      326:  710-block  0
+      326:  711:            if (!en)
+        -:  712:            {
+    #####:  713:                _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  713-block  0
+        -:  714:                                "Extension string retrieval is broken");
+       3*:  715:                return GLFW_FALSE;
+        3:  715-block  0
+        -:  716:            }
+        -:  717:
+      326:  718:            if (strcmp(en, extension) == 0)
+      326:  718-block  0
+        3:  719:                return GLFW_TRUE;
+        3:  719-block  0
+        -:  720:        }
+        -:  721:    }
+        -:  722:    else
+        -:  723:    {
+        -:  724:        // Check if extension is in the old style OpenGL extensions string
+        -:  725:
+        -:  726:        const char* extensions = (const char*)
+    #####:  727:            window->context.GetString(GL_EXTENSIONS);
+    %%%%%:  727-block  0
+    #####:  728:        if (!extensions)
+        -:  729:        {
+    #####:  730:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  730-block  0
+        -:  731:                            "Extension string retrieval is broken");
+    #####:  732:            return GLFW_FALSE;
+        -:  733:        }
+        -:  734:
+    #####:  735:        if (_glfwStringInExtensionString(extension, extensions))
+    %%%%%:  735-block  0
+    #####:  736:            return GLFW_TRUE;
+    %%%%%:  736-block  0
+        -:  737:    }
+        -:  738:
+        -:  739:    // Check if extension is in the platform-specific string
+    #####:  740:    return window->context.extensionSupported(extension);
+    %%%%%:  740-block  0
+        -:  741:}
+        -:  742:
+    #####:  743:GLFWAPI GLFWglproc glfwGetProcAddress(const char* procname)
+        -:  744:{
+        -:  745:    _GLFWwindow* window;
+    #####:  746:    assert(procname != NULL);
+    %%%%%:  746-block  0
+    %%%%%:  746-block  1
+        -:  747:
+    #####:  748:    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+    %%%%%:  748-block  0
+    %%%%%:  748-block  1
+        -:  749:
+    #####:  750:    window = _glfwPlatformGetTls(&_glfw.contextSlot);
+    %%%%%:  750-block  0
+    #####:  751:    if (!window)
+        -:  752:    {
+    #####:  753:        _glfwInputError(GLFW_NO_CURRENT_CONTEXT,
+    %%%%%:  753-block  0
+        -:  754:                        "Cannot query entry point without a current OpenGL or OpenGL ES context");
+    #####:  755:        return NULL;
+        -:  756:    }
+        -:  757:
+    #####:  758:    return window->context.getProcAddress(procname);
+    %%%%%:  758-block  0
+        -:  759:}
+        -:  760:

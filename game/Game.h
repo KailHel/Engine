@@ -15,6 +15,8 @@
 #include "../graphics/Texture.h"
 #include "../graphics/Sprite.h"
 #include "../graphics/Camera.h"
+#include "Events.h"
+#include "../graphics/Camera.h"
 
 using std::string;
 using std::cout;
@@ -38,8 +40,8 @@ public:
     void Dispose() override;
 
 
-    SK::Render::Sprite* s;
-
+    SK::Render::Sprite* s[16];
+    Camera* cam;
 
 };
 

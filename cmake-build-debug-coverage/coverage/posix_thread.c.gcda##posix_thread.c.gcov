@@ -1,0 +1,135 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/external_libraries/glfw/src/posix_thread.c
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/posix_thread.c.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/posix_thread.c.gcda
+        -:    0:Runs:1
+        -:    1://========================================================================
+        -:    2:// GLFW 3.4 POSIX - www.glfw.org
+        -:    3://------------------------------------------------------------------------
+        -:    4:// Copyright (c) 2002-2006 Marcus Geelnard
+        -:    5:// Copyright (c) 2006-2017 Camilla Löwy <elmindreda@glfw.org>
+        -:    6://
+        -:    7:// This software is provided 'as-is', without any express or implied
+        -:    8:// warranty. In no event will the authors be held liable for any damages
+        -:    9:// arising from the use of this software.
+        -:   10://
+        -:   11:// Permission is granted to anyone to use this software for any purpose,
+        -:   12:// including commercial applications, and to alter it and redistribute it
+        -:   13:// freely, subject to the following restrictions:
+        -:   14://
+        -:   15:// 1. The origin of this software must not be misrepresented; you must not
+        -:   16://    claim that you wrote the original software. If you use this software
+        -:   17://    in a product, an acknowledgment in the product documentation would
+        -:   18://    be appreciated but is not required.
+        -:   19://
+        -:   20:// 2. Altered source versions must be plainly marked as such, and must not
+        -:   21://    be misrepresented as being the original software.
+        -:   22://
+        -:   23:// 3. This notice may not be removed or altered from any source
+        -:   24://    distribution.
+        -:   25://
+        -:   26://========================================================================
+        -:   27:// It is fine to use C99 in this file because it will not be built with VS
+        -:   28://========================================================================
+        -:   29:
+        -:   30:#include "internal.h"
+        -:   31:
+        -:   32:#include <assert.h>
+        -:   33:#include <string.h>
+        -:   34:
+        -:   35:
+        -:   36://////////////////////////////////////////////////////////////////////////
+        -:   37://////                       GLFW platform API                      //////
+        -:   38://////////////////////////////////////////////////////////////////////////
+        -:   39:
+        2:   40:GLFWbool _glfwPlatformCreateTls(_GLFWtls* tls)
+        -:   41:{
+       2*:   42:    assert(tls->posix.allocated == GLFW_FALSE);
+        2:   42-block  0
+    %%%%%:   42-block  1
+        -:   43:
+        2:   44:    if (pthread_key_create(&tls->posix.key, NULL) != 0)
+        2:   44-block  0
+        -:   45:    {
+    #####:   46:        _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:   46-block  0
+        -:   47:                        "POSIX: Failed to create context TLS");
+    #####:   48:        return GLFW_FALSE;
+        -:   49:    }
+        -:   50:
+        2:   51:    tls->posix.allocated = GLFW_TRUE;
+        2:   52:    return GLFW_TRUE;
+        2:   52-block  0
+        -:   53:}
+        -:   54:
+    #####:   55:void _glfwPlatformDestroyTls(_GLFWtls* tls)
+        -:   56:{
+    #####:   57:    if (tls->posix.allocated)
+    %%%%%:   57-block  0
+    #####:   58:        pthread_key_delete(tls->posix.key);
+    %%%%%:   58-block  0
+    #####:   59:    memset(tls, 0, sizeof(_GLFWtls));
+    #####:   60:}
+        -:   61:
+        7:   62:void* _glfwPlatformGetTls(_GLFWtls* tls)
+        -:   63:{
+       7*:   64:    assert(tls->posix.allocated == GLFW_TRUE);
+        7:   64-block  0
+    %%%%%:   64-block  1
+        7:   65:    return pthread_getspecific(tls->posix.key);
+        7:   65-block  0
+        -:   66:}
+        -:   67:
+        4:   68:void _glfwPlatformSetTls(_GLFWtls* tls, void* value)
+        -:   69:{
+       4*:   70:    assert(tls->posix.allocated == GLFW_TRUE);
+        4:   70-block  0
+    %%%%%:   70-block  1
+        4:   71:    pthread_setspecific(tls->posix.key, value);
+        4:   71-block  0
+        4:   72:}
+        -:   73:
+        1:   74:GLFWbool _glfwPlatformCreateMutex(_GLFWmutex* mutex)
+        -:   75:{
+       1*:   76:    assert(mutex->posix.allocated == GLFW_FALSE);
+        1:   76-block  0
+    %%%%%:   76-block  1
+        -:   77:
+        1:   78:    if (pthread_mutex_init(&mutex->posix.handle, NULL) != 0)
+        1:   78-block  0
+        -:   79:    {
+    #####:   80:        _glfwInputError(GLFW_PLATFORM_ERROR, "POSIX: Failed to create mutex");
+    %%%%%:   80-block  0
+    #####:   81:        return GLFW_FALSE;
+        -:   82:    }
+        -:   83:
+        1:   84:    return mutex->posix.allocated = GLFW_TRUE;
+        1:   84-block  0
+        -:   85:}
+        -:   86:
+    #####:   87:void _glfwPlatformDestroyMutex(_GLFWmutex* mutex)
+        -:   88:{
+    #####:   89:    if (mutex->posix.allocated)
+    %%%%%:   89-block  0
+    #####:   90:        pthread_mutex_destroy(&mutex->posix.handle);
+    %%%%%:   90-block  0
+    #####:   91:    memset(mutex, 0, sizeof(_GLFWmutex));
+    #####:   92:}
+        -:   93:
+    #####:   94:void _glfwPlatformLockMutex(_GLFWmutex* mutex)
+        -:   95:{
+    #####:   96:    assert(mutex->posix.allocated == GLFW_TRUE);
+    %%%%%:   96-block  0
+    %%%%%:   96-block  1
+    #####:   97:    pthread_mutex_lock(&mutex->posix.handle);
+    %%%%%:   97-block  0
+    #####:   98:}
+        -:   99:
+    #####:  100:void _glfwPlatformUnlockMutex(_GLFWmutex* mutex)
+        -:  101:{
+    #####:  102:    assert(mutex->posix.allocated == GLFW_TRUE);
+    %%%%%:  102-block  0
+    %%%%%:  102-block  1
+    #####:  103:    pthread_mutex_unlock(&mutex->posix.handle);
+    %%%%%:  103-block  0
+    #####:  104:}
+        -:  105:

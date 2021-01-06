@@ -1,0 +1,1815 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/external_libraries/glfw/src/x11_init.c
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/x11_init.c.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/x11_init.c.gcda
+        -:    0:Runs:1
+        -:    1://========================================================================
+        -:    2:// GLFW 3.4 X11 - www.glfw.org
+        -:    3://------------------------------------------------------------------------
+        -:    4:// Copyright (c) 2002-2006 Marcus Geelnard
+        -:    5:// Copyright (c) 2006-2019 Camilla Löwy <elmindreda@glfw.org>
+        -:    6://
+        -:    7:// This software is provided 'as-is', without any express or implied
+        -:    8:// warranty. In no event will the authors be held liable for any damages
+        -:    9:// arising from the use of this software.
+        -:   10://
+        -:   11:// Permission is granted to anyone to use this software for any purpose,
+        -:   12:// including commercial applications, and to alter it and redistribute it
+        -:   13:// freely, subject to the following restrictions:
+        -:   14://
+        -:   15:// 1. The origin of this software must not be misrepresented; you must not
+        -:   16://    claim that you wrote the original software. If you use this software
+        -:   17://    in a product, an acknowledgment in the product documentation would
+        -:   18://    be appreciated but is not required.
+        -:   19://
+        -:   20:// 2. Altered source versions must be plainly marked as such, and must not
+        -:   21://    be misrepresented as being the original software.
+        -:   22://
+        -:   23:// 3. This notice may not be removed or altered from any source
+        -:   24://    distribution.
+        -:   25://
+        -:   26://========================================================================
+        -:   27:// It is fine to use C99 in this file because it will not be built with VS
+        -:   28://========================================================================
+        -:   29:
+        -:   30:#include "internal.h"
+        -:   31:
+        -:   32:#include <stdlib.h>
+        -:   33:#include <string.h>
+        -:   34:#include <limits.h>
+        -:   35:#include <stdio.h>
+        -:   36:#include <locale.h>
+        -:   37:#include <unistd.h>
+        -:   38:
+        -:   39:
+        -:   40:// Translate the X11 KeySyms for a key to a GLFW key code
+        -:   41:// NOTE: This is only used as a fallback, in case the XKB method fails
+        -:   42://       It is layout-dependent and will fail partially on most non-US layouts
+        -:   43://
+      128:   44:static int translateKeySyms(const KeySym* keysyms, int width)
+        -:   45:{
+      128:   46:    if (width > 1)
+      128:   46-block  0
+        -:   47:    {
+      128:   48:        switch (keysyms[1])
+      128:   48-block  0
+        -:   49:        {
+    #####:   50:            case XK_KP_0:           return GLFW_KEY_KP_0;
+    %%%%%:   50-block  0
+    #####:   51:            case XK_KP_1:           return GLFW_KEY_KP_1;
+    %%%%%:   51-block  0
+    #####:   52:            case XK_KP_2:           return GLFW_KEY_KP_2;
+    %%%%%:   52-block  0
+    #####:   53:            case XK_KP_3:           return GLFW_KEY_KP_3;
+    %%%%%:   53-block  0
+    #####:   54:            case XK_KP_4:           return GLFW_KEY_KP_4;
+    %%%%%:   54-block  0
+    #####:   55:            case XK_KP_5:           return GLFW_KEY_KP_5;
+    %%%%%:   55-block  0
+    #####:   56:            case XK_KP_6:           return GLFW_KEY_KP_6;
+    %%%%%:   56-block  0
+    #####:   57:            case XK_KP_7:           return GLFW_KEY_KP_7;
+    %%%%%:   57-block  0
+    #####:   58:            case XK_KP_8:           return GLFW_KEY_KP_8;
+    %%%%%:   58-block  0
+    #####:   59:            case XK_KP_9:           return GLFW_KEY_KP_9;
+    %%%%%:   59-block  0
+        1:   60:            case XK_KP_Separator:
+        1:   61:            case XK_KP_Decimal:     return GLFW_KEY_KP_DECIMAL;
+        1:   61-block  0
+    #####:   62:            case XK_KP_Equal:       return GLFW_KEY_KP_EQUAL;
+    %%%%%:   62-block  0
+    #####:   63:            case XK_KP_Enter:       return GLFW_KEY_KP_ENTER;
+    %%%%%:   63-block  0
+      127:   64:            default:                break;
+      127:   64-block  0
+        -:   65:        }
+    #####:   66:    }
+    %%%%%:   66-block  0
+        -:   67:
+      127:   68:    switch (keysyms[0])
+      127:   68-block  0
+        -:   69:    {
+    #####:   70:        case XK_Escape:         return GLFW_KEY_ESCAPE;
+    %%%%%:   70-block  0
+    #####:   71:        case XK_Tab:            return GLFW_KEY_TAB;
+    %%%%%:   71-block  0
+    #####:   72:        case XK_Shift_L:        return GLFW_KEY_LEFT_SHIFT;
+    %%%%%:   72-block  0
+    #####:   73:        case XK_Shift_R:        return GLFW_KEY_RIGHT_SHIFT;
+    %%%%%:   73-block  0
+    #####:   74:        case XK_Control_L:      return GLFW_KEY_LEFT_CONTROL;
+    %%%%%:   74-block  0
+    #####:   75:        case XK_Control_R:      return GLFW_KEY_RIGHT_CONTROL;
+    %%%%%:   75-block  0
+    #####:   76:        case XK_Meta_L:
+    #####:   77:        case XK_Alt_L:          return GLFW_KEY_LEFT_ALT;
+    %%%%%:   77-block  0
+    #####:   78:        case XK_Mode_switch: // Mapped to Alt_R on many keyboards
+        -:   79:        case XK_ISO_Level3_Shift: // AltGr on at least some machines
+        -:   80:        case XK_Meta_R:
+    #####:   81:        case XK_Alt_R:          return GLFW_KEY_RIGHT_ALT;
+    %%%%%:   81-block  0
+    #####:   82:        case XK_Super_L:        return GLFW_KEY_LEFT_SUPER;
+    %%%%%:   82-block  0
+    #####:   83:        case XK_Super_R:        return GLFW_KEY_RIGHT_SUPER;
+    %%%%%:   83-block  0
+    #####:   84:        case XK_Menu:           return GLFW_KEY_MENU;
+    %%%%%:   84-block  0
+    #####:   85:        case XK_Num_Lock:       return GLFW_KEY_NUM_LOCK;
+    %%%%%:   85-block  0
+    #####:   86:        case XK_Caps_Lock:      return GLFW_KEY_CAPS_LOCK;
+    %%%%%:   86-block  0
+        1:   87:        case XK_Print:          return GLFW_KEY_PRINT_SCREEN;
+        1:   87-block  0
+    #####:   88:        case XK_Scroll_Lock:    return GLFW_KEY_SCROLL_LOCK;
+    %%%%%:   88-block  0
+    #####:   89:        case XK_Pause:          return GLFW_KEY_PAUSE;
+    %%%%%:   89-block  0
+    #####:   90:        case XK_Delete:         return GLFW_KEY_DELETE;
+    %%%%%:   90-block  0
+    #####:   91:        case XK_BackSpace:      return GLFW_KEY_BACKSPACE;
+    %%%%%:   91-block  0
+    #####:   92:        case XK_Return:         return GLFW_KEY_ENTER;
+    %%%%%:   92-block  0
+    #####:   93:        case XK_Home:           return GLFW_KEY_HOME;
+    %%%%%:   93-block  0
+    #####:   94:        case XK_End:            return GLFW_KEY_END;
+    %%%%%:   94-block  0
+    #####:   95:        case XK_Page_Up:        return GLFW_KEY_PAGE_UP;
+    %%%%%:   95-block  0
+    #####:   96:        case XK_Page_Down:      return GLFW_KEY_PAGE_DOWN;
+    %%%%%:   96-block  0
+    #####:   97:        case XK_Insert:         return GLFW_KEY_INSERT;
+    %%%%%:   97-block  0
+    #####:   98:        case XK_Left:           return GLFW_KEY_LEFT;
+    %%%%%:   98-block  0
+    #####:   99:        case XK_Right:          return GLFW_KEY_RIGHT;
+    %%%%%:   99-block  0
+    #####:  100:        case XK_Down:           return GLFW_KEY_DOWN;
+    %%%%%:  100-block  0
+    #####:  101:        case XK_Up:             return GLFW_KEY_UP;
+    %%%%%:  101-block  0
+    #####:  102:        case XK_F1:             return GLFW_KEY_F1;
+    %%%%%:  102-block  0
+    #####:  103:        case XK_F2:             return GLFW_KEY_F2;
+    %%%%%:  103-block  0
+    #####:  104:        case XK_F3:             return GLFW_KEY_F3;
+    %%%%%:  104-block  0
+    #####:  105:        case XK_F4:             return GLFW_KEY_F4;
+    %%%%%:  105-block  0
+    #####:  106:        case XK_F5:             return GLFW_KEY_F5;
+    %%%%%:  106-block  0
+    #####:  107:        case XK_F6:             return GLFW_KEY_F6;
+    %%%%%:  107-block  0
+    #####:  108:        case XK_F7:             return GLFW_KEY_F7;
+    %%%%%:  108-block  0
+    #####:  109:        case XK_F8:             return GLFW_KEY_F8;
+    %%%%%:  109-block  0
+    #####:  110:        case XK_F9:             return GLFW_KEY_F9;
+    %%%%%:  110-block  0
+    #####:  111:        case XK_F10:            return GLFW_KEY_F10;
+    %%%%%:  111-block  0
+    #####:  112:        case XK_F11:            return GLFW_KEY_F11;
+    %%%%%:  112-block  0
+    #####:  113:        case XK_F12:            return GLFW_KEY_F12;
+    %%%%%:  113-block  0
+    #####:  114:        case XK_F13:            return GLFW_KEY_F13;
+    %%%%%:  114-block  0
+    #####:  115:        case XK_F14:            return GLFW_KEY_F14;
+    %%%%%:  115-block  0
+    #####:  116:        case XK_F15:            return GLFW_KEY_F15;
+    %%%%%:  116-block  0
+    #####:  117:        case XK_F16:            return GLFW_KEY_F16;
+    %%%%%:  117-block  0
+    #####:  118:        case XK_F17:            return GLFW_KEY_F17;
+    %%%%%:  118-block  0
+    #####:  119:        case XK_F18:            return GLFW_KEY_F18;
+    %%%%%:  119-block  0
+    #####:  120:        case XK_F19:            return GLFW_KEY_F19;
+    %%%%%:  120-block  0
+    #####:  121:        case XK_F20:            return GLFW_KEY_F20;
+    %%%%%:  121-block  0
+    #####:  122:        case XK_F21:            return GLFW_KEY_F21;
+    %%%%%:  122-block  0
+    #####:  123:        case XK_F22:            return GLFW_KEY_F22;
+    %%%%%:  123-block  0
+    #####:  124:        case XK_F23:            return GLFW_KEY_F23;
+    %%%%%:  124-block  0
+    #####:  125:        case XK_F24:            return GLFW_KEY_F24;
+    %%%%%:  125-block  0
+    #####:  126:        case XK_F25:            return GLFW_KEY_F25;
+    %%%%%:  126-block  0
+        -:  127:
+        -:  128:        // Numeric keypad
+    #####:  129:        case XK_KP_Divide:      return GLFW_KEY_KP_DIVIDE;
+    %%%%%:  129-block  0
+    #####:  130:        case XK_KP_Multiply:    return GLFW_KEY_KP_MULTIPLY;
+    %%%%%:  130-block  0
+    #####:  131:        case XK_KP_Subtract:    return GLFW_KEY_KP_SUBTRACT;
+    %%%%%:  131-block  0
+    #####:  132:        case XK_KP_Add:         return GLFW_KEY_KP_ADD;
+    %%%%%:  132-block  0
+        -:  133:
+        -:  134:        // These should have been detected in secondary keysym test above!
+    #####:  135:        case XK_KP_Insert:      return GLFW_KEY_KP_0;
+    %%%%%:  135-block  0
+    #####:  136:        case XK_KP_End:         return GLFW_KEY_KP_1;
+    %%%%%:  136-block  0
+    #####:  137:        case XK_KP_Down:        return GLFW_KEY_KP_2;
+    %%%%%:  137-block  0
+    #####:  138:        case XK_KP_Page_Down:   return GLFW_KEY_KP_3;
+    %%%%%:  138-block  0
+    #####:  139:        case XK_KP_Left:        return GLFW_KEY_KP_4;
+    %%%%%:  139-block  0
+    #####:  140:        case XK_KP_Right:       return GLFW_KEY_KP_6;
+    %%%%%:  140-block  0
+    #####:  141:        case XK_KP_Home:        return GLFW_KEY_KP_7;
+    %%%%%:  141-block  0
+    #####:  142:        case XK_KP_Up:          return GLFW_KEY_KP_8;
+    %%%%%:  142-block  0
+    #####:  143:        case XK_KP_Page_Up:     return GLFW_KEY_KP_9;
+    %%%%%:  143-block  0
+    #####:  144:        case XK_KP_Delete:      return GLFW_KEY_KP_DECIMAL;
+    %%%%%:  144-block  0
+    #####:  145:        case XK_KP_Equal:       return GLFW_KEY_KP_EQUAL;
+    %%%%%:  145-block  0
+    #####:  146:        case XK_KP_Enter:       return GLFW_KEY_KP_ENTER;
+    %%%%%:  146-block  0
+        -:  147:
+        -:  148:        // Last resort: Check for printable keys (should not happen if the XKB
+        -:  149:        // extension is available). This will give a layout dependent mapping
+        -:  150:        // (which is wrong, and we may miss some keys, especially on non-US
+        -:  151:        // keyboards), but it's better than nothing...
+    #####:  152:        case XK_a:              return GLFW_KEY_A;
+    %%%%%:  152-block  0
+    #####:  153:        case XK_b:              return GLFW_KEY_B;
+    %%%%%:  153-block  0
+    #####:  154:        case XK_c:              return GLFW_KEY_C;
+    %%%%%:  154-block  0
+    #####:  155:        case XK_d:              return GLFW_KEY_D;
+    %%%%%:  155-block  0
+    #####:  156:        case XK_e:              return GLFW_KEY_E;
+    %%%%%:  156-block  0
+    #####:  157:        case XK_f:              return GLFW_KEY_F;
+    %%%%%:  157-block  0
+    #####:  158:        case XK_g:              return GLFW_KEY_G;
+    %%%%%:  158-block  0
+    #####:  159:        case XK_h:              return GLFW_KEY_H;
+    %%%%%:  159-block  0
+    #####:  160:        case XK_i:              return GLFW_KEY_I;
+    %%%%%:  160-block  0
+    #####:  161:        case XK_j:              return GLFW_KEY_J;
+    %%%%%:  161-block  0
+    #####:  162:        case XK_k:              return GLFW_KEY_K;
+    %%%%%:  162-block  0
+    #####:  163:        case XK_l:              return GLFW_KEY_L;
+    %%%%%:  163-block  0
+    #####:  164:        case XK_m:              return GLFW_KEY_M;
+    %%%%%:  164-block  0
+    #####:  165:        case XK_n:              return GLFW_KEY_N;
+    %%%%%:  165-block  0
+    #####:  166:        case XK_o:              return GLFW_KEY_O;
+    %%%%%:  166-block  0
+    #####:  167:        case XK_p:              return GLFW_KEY_P;
+    %%%%%:  167-block  0
+    #####:  168:        case XK_q:              return GLFW_KEY_Q;
+    %%%%%:  168-block  0
+    #####:  169:        case XK_r:              return GLFW_KEY_R;
+    %%%%%:  169-block  0
+    #####:  170:        case XK_s:              return GLFW_KEY_S;
+    %%%%%:  170-block  0
+    #####:  171:        case XK_t:              return GLFW_KEY_T;
+    %%%%%:  171-block  0
+    #####:  172:        case XK_u:              return GLFW_KEY_U;
+    %%%%%:  172-block  0
+    #####:  173:        case XK_v:              return GLFW_KEY_V;
+    %%%%%:  173-block  0
+    #####:  174:        case XK_w:              return GLFW_KEY_W;
+    %%%%%:  174-block  0
+    #####:  175:        case XK_x:              return GLFW_KEY_X;
+    %%%%%:  175-block  0
+    #####:  176:        case XK_y:              return GLFW_KEY_Y;
+    %%%%%:  176-block  0
+    #####:  177:        case XK_z:              return GLFW_KEY_Z;
+    %%%%%:  177-block  0
+    #####:  178:        case XK_1:              return GLFW_KEY_1;
+    %%%%%:  178-block  0
+    #####:  179:        case XK_2:              return GLFW_KEY_2;
+    %%%%%:  179-block  0
+    #####:  180:        case XK_3:              return GLFW_KEY_3;
+    %%%%%:  180-block  0
+    #####:  181:        case XK_4:              return GLFW_KEY_4;
+    %%%%%:  181-block  0
+    #####:  182:        case XK_5:              return GLFW_KEY_5;
+    %%%%%:  182-block  0
+    #####:  183:        case XK_6:              return GLFW_KEY_6;
+    %%%%%:  183-block  0
+    #####:  184:        case XK_7:              return GLFW_KEY_7;
+    %%%%%:  184-block  0
+    #####:  185:        case XK_8:              return GLFW_KEY_8;
+    %%%%%:  185-block  0
+    #####:  186:        case XK_9:              return GLFW_KEY_9;
+    %%%%%:  186-block  0
+    #####:  187:        case XK_0:              return GLFW_KEY_0;
+    %%%%%:  187-block  0
+    #####:  188:        case XK_space:          return GLFW_KEY_SPACE;
+    %%%%%:  188-block  0
+    #####:  189:        case XK_minus:          return GLFW_KEY_MINUS;
+    %%%%%:  189-block  0
+    #####:  190:        case XK_equal:          return GLFW_KEY_EQUAL;
+    %%%%%:  190-block  0
+    #####:  191:        case XK_bracketleft:    return GLFW_KEY_LEFT_BRACKET;
+    %%%%%:  191-block  0
+    #####:  192:        case XK_bracketright:   return GLFW_KEY_RIGHT_BRACKET;
+    %%%%%:  192-block  0
+    #####:  193:        case XK_backslash:      return GLFW_KEY_BACKSLASH;
+    %%%%%:  193-block  0
+    #####:  194:        case XK_semicolon:      return GLFW_KEY_SEMICOLON;
+    %%%%%:  194-block  0
+    #####:  195:        case XK_apostrophe:     return GLFW_KEY_APOSTROPHE;
+    %%%%%:  195-block  0
+    #####:  196:        case XK_grave:          return GLFW_KEY_GRAVE_ACCENT;
+    %%%%%:  196-block  0
+    #####:  197:        case XK_comma:          return GLFW_KEY_COMMA;
+    %%%%%:  197-block  0
+    #####:  198:        case XK_period:         return GLFW_KEY_PERIOD;
+    %%%%%:  198-block  0
+    #####:  199:        case XK_slash:          return GLFW_KEY_SLASH;
+    %%%%%:  199-block  0
+    #####:  200:        case XK_less:           return GLFW_KEY_WORLD_1; // At least in some layouts...
+    %%%%%:  200-block  0
+      126:  201:        default:                break;
+        -:  202:    }
+        -:  203:
+        -:  204:    // No matching translation was found
+      126:  205:    return GLFW_KEY_UNKNOWN;
+      126:  205-block  0
+        -:  206:}
+        -:  207:
+        -:  208:// Create key code translation tables
+        -:  209://
+        1:  210:static void createKeyTables(void)
+        -:  211:{
+        -:  212:    int scancode, scancodeMin, scancodeMax;
+        -:  213:
+        1:  214:    memset(_glfw.x11.keycodes, -1, sizeof(_glfw.x11.keycodes));
+        1:  215:    memset(_glfw.x11.scancodes, -1, sizeof(_glfw.x11.scancodes));
+        -:  216:
+        1:  217:    if (_glfw.x11.xkb.available)
+        1:  217-block  0
+        -:  218:    {
+        -:  219:        // Use XKB to determine physical key locations independently of the
+        -:  220:        // current keyboard layout
+        -:  221:
+        1:  222:        XkbDescPtr desc = XkbGetMap(_glfw.x11.display, 0, XkbUseCoreKbd);
+        1:  222-block  0
+        1:  223:        XkbGetNames(_glfw.x11.display, XkbKeyNamesMask | XkbKeyAliasesMask, desc);
+        -:  224:
+        1:  225:        scancodeMin = desc->min_key_code;
+        1:  226:        scancodeMax = desc->max_key_code;
+        -:  227:
+        -:  228:        const struct
+        -:  229:        {
+        -:  230:            int key;
+        -:  231:            char* name;
+        1:  232:        } keymap[] =
+        -:  233:        {
+        -:  234:            { GLFW_KEY_GRAVE_ACCENT, "TLDE" },
+        -:  235:            { GLFW_KEY_1, "AE01" },
+        -:  236:            { GLFW_KEY_2, "AE02" },
+        -:  237:            { GLFW_KEY_3, "AE03" },
+        -:  238:            { GLFW_KEY_4, "AE04" },
+        -:  239:            { GLFW_KEY_5, "AE05" },
+        -:  240:            { GLFW_KEY_6, "AE06" },
+        -:  241:            { GLFW_KEY_7, "AE07" },
+        -:  242:            { GLFW_KEY_8, "AE08" },
+        -:  243:            { GLFW_KEY_9, "AE09" },
+        -:  244:            { GLFW_KEY_0, "AE10" },
+        -:  245:            { GLFW_KEY_MINUS, "AE11" },
+        -:  246:            { GLFW_KEY_EQUAL, "AE12" },
+        -:  247:            { GLFW_KEY_Q, "AD01" },
+        -:  248:            { GLFW_KEY_W, "AD02" },
+        -:  249:            { GLFW_KEY_E, "AD03" },
+        -:  250:            { GLFW_KEY_R, "AD04" },
+        -:  251:            { GLFW_KEY_T, "AD05" },
+        -:  252:            { GLFW_KEY_Y, "AD06" },
+        -:  253:            { GLFW_KEY_U, "AD07" },
+        -:  254:            { GLFW_KEY_I, "AD08" },
+        -:  255:            { GLFW_KEY_O, "AD09" },
+        -:  256:            { GLFW_KEY_P, "AD10" },
+        -:  257:            { GLFW_KEY_LEFT_BRACKET, "AD11" },
+        -:  258:            { GLFW_KEY_RIGHT_BRACKET, "AD12" },
+        -:  259:            { GLFW_KEY_A, "AC01" },
+        -:  260:            { GLFW_KEY_S, "AC02" },
+        -:  261:            { GLFW_KEY_D, "AC03" },
+        -:  262:            { GLFW_KEY_F, "AC04" },
+        -:  263:            { GLFW_KEY_G, "AC05" },
+        -:  264:            { GLFW_KEY_H, "AC06" },
+        -:  265:            { GLFW_KEY_J, "AC07" },
+        -:  266:            { GLFW_KEY_K, "AC08" },
+        -:  267:            { GLFW_KEY_L, "AC09" },
+        -:  268:            { GLFW_KEY_SEMICOLON, "AC10" },
+        -:  269:            { GLFW_KEY_APOSTROPHE, "AC11" },
+        -:  270:            { GLFW_KEY_Z, "AB01" },
+        -:  271:            { GLFW_KEY_X, "AB02" },
+        -:  272:            { GLFW_KEY_C, "AB03" },
+        -:  273:            { GLFW_KEY_V, "AB04" },
+        -:  274:            { GLFW_KEY_B, "AB05" },
+        -:  275:            { GLFW_KEY_N, "AB06" },
+        -:  276:            { GLFW_KEY_M, "AB07" },
+        -:  277:            { GLFW_KEY_COMMA, "AB08" },
+        -:  278:            { GLFW_KEY_PERIOD, "AB09" },
+        -:  279:            { GLFW_KEY_SLASH, "AB10" },
+        -:  280:            { GLFW_KEY_BACKSLASH, "BKSL" },
+        -:  281:            { GLFW_KEY_WORLD_1, "LSGT" },
+        -:  282:            { GLFW_KEY_SPACE, "SPCE" },
+        -:  283:            { GLFW_KEY_ESCAPE, "ESC" },
+        -:  284:            { GLFW_KEY_ENTER, "RTRN" },
+        -:  285:            { GLFW_KEY_TAB, "TAB" },
+        -:  286:            { GLFW_KEY_BACKSPACE, "BKSP" },
+        -:  287:            { GLFW_KEY_INSERT, "INS" },
+        -:  288:            { GLFW_KEY_DELETE, "DELE" },
+        -:  289:            { GLFW_KEY_RIGHT, "RGHT" },
+        -:  290:            { GLFW_KEY_LEFT, "LEFT" },
+        -:  291:            { GLFW_KEY_DOWN, "DOWN" },
+        -:  292:            { GLFW_KEY_UP, "UP" },
+        -:  293:            { GLFW_KEY_PAGE_UP, "PGUP" },
+        -:  294:            { GLFW_KEY_PAGE_DOWN, "PGDN" },
+        -:  295:            { GLFW_KEY_HOME, "HOME" },
+        -:  296:            { GLFW_KEY_END, "END" },
+        -:  297:            { GLFW_KEY_CAPS_LOCK, "CAPS" },
+        -:  298:            { GLFW_KEY_SCROLL_LOCK, "SCLK" },
+        -:  299:            { GLFW_KEY_NUM_LOCK, "NMLK" },
+        -:  300:            { GLFW_KEY_PRINT_SCREEN, "PRSC" },
+        -:  301:            { GLFW_KEY_PAUSE, "PAUS" },
+        -:  302:            { GLFW_KEY_F1, "FK01" },
+        -:  303:            { GLFW_KEY_F2, "FK02" },
+        -:  304:            { GLFW_KEY_F3, "FK03" },
+        -:  305:            { GLFW_KEY_F4, "FK04" },
+        -:  306:            { GLFW_KEY_F5, "FK05" },
+        -:  307:            { GLFW_KEY_F6, "FK06" },
+        -:  308:            { GLFW_KEY_F7, "FK07" },
+        -:  309:            { GLFW_KEY_F8, "FK08" },
+        -:  310:            { GLFW_KEY_F9, "FK09" },
+        -:  311:            { GLFW_KEY_F10, "FK10" },
+        -:  312:            { GLFW_KEY_F11, "FK11" },
+        -:  313:            { GLFW_KEY_F12, "FK12" },
+        -:  314:            { GLFW_KEY_F13, "FK13" },
+        -:  315:            { GLFW_KEY_F14, "FK14" },
+        -:  316:            { GLFW_KEY_F15, "FK15" },
+        -:  317:            { GLFW_KEY_F16, "FK16" },
+        -:  318:            { GLFW_KEY_F17, "FK17" },
+        -:  319:            { GLFW_KEY_F18, "FK18" },
+        -:  320:            { GLFW_KEY_F19, "FK19" },
+        -:  321:            { GLFW_KEY_F20, "FK20" },
+        -:  322:            { GLFW_KEY_F21, "FK21" },
+        -:  323:            { GLFW_KEY_F22, "FK22" },
+        -:  324:            { GLFW_KEY_F23, "FK23" },
+        -:  325:            { GLFW_KEY_F24, "FK24" },
+        -:  326:            { GLFW_KEY_F25, "FK25" },
+        -:  327:            { GLFW_KEY_KP_0, "KP0" },
+        -:  328:            { GLFW_KEY_KP_1, "KP1" },
+        -:  329:            { GLFW_KEY_KP_2, "KP2" },
+        -:  330:            { GLFW_KEY_KP_3, "KP3" },
+        -:  331:            { GLFW_KEY_KP_4, "KP4" },
+        -:  332:            { GLFW_KEY_KP_5, "KP5" },
+        -:  333:            { GLFW_KEY_KP_6, "KP6" },
+        -:  334:            { GLFW_KEY_KP_7, "KP7" },
+        -:  335:            { GLFW_KEY_KP_8, "KP8" },
+        -:  336:            { GLFW_KEY_KP_9, "KP9" },
+        -:  337:            { GLFW_KEY_KP_DECIMAL, "KPDL" },
+        -:  338:            { GLFW_KEY_KP_DIVIDE, "KPDV" },
+        -:  339:            { GLFW_KEY_KP_MULTIPLY, "KPMU" },
+        -:  340:            { GLFW_KEY_KP_SUBTRACT, "KPSU" },
+        -:  341:            { GLFW_KEY_KP_ADD, "KPAD" },
+        -:  342:            { GLFW_KEY_KP_ENTER, "KPEN" },
+        -:  343:            { GLFW_KEY_KP_EQUAL, "KPEQ" },
+        -:  344:            { GLFW_KEY_LEFT_SHIFT, "LFSH" },
+        -:  345:            { GLFW_KEY_LEFT_CONTROL, "LCTL" },
+        -:  346:            { GLFW_KEY_LEFT_ALT, "LALT" },
+        -:  347:            { GLFW_KEY_LEFT_SUPER, "LWIN" },
+        -:  348:            { GLFW_KEY_RIGHT_SHIFT, "RTSH" },
+        -:  349:            { GLFW_KEY_RIGHT_CONTROL, "RCTL" },
+        -:  350:            { GLFW_KEY_RIGHT_ALT, "RALT" },
+        -:  351:            { GLFW_KEY_RIGHT_ALT, "LVL3" },
+        -:  352:            { GLFW_KEY_RIGHT_ALT, "MDSW" },
+        -:  353:            { GLFW_KEY_RIGHT_SUPER, "RWIN" },
+        -:  354:            { GLFW_KEY_MENU, "MENU" }
+        -:  355:        };
+        -:  356:
+        -:  357:        // Find the X11 key code -> GLFW key code mapping
+      249:  358:        for (scancode = scancodeMin;  scancode <= scancodeMax;  scancode++)
+      249:  358-block  0
+        -:  359:        {
+      248:  360:            int key = GLFW_KEY_UNKNOWN;
+        -:  361:
+        -:  362:            // Map the key name to a GLFW key code. Note: We use the US
+        -:  363:            // keyboard layout. Because function keys aren't mapped correctly
+        -:  364:            // when using traditional KeySym translations, they are mapped
+        -:  365:            // here instead.
+    22905:  366:            for (int i = 0;  i < sizeof(keymap) / sizeof(keymap[0]);  i++)
+      248:  366-block  0
+    22657:  366-block  1
+    22905:  366-block  2
+        -:  367:            {
+    22776:  368:                if (strncmp(desc->names->keys[scancode].name,
+    22776:  369:                            keymap[i].name,
+    22776:  369-block  0
+        -:  370:                            XkbKeyNameLength) == 0)
+        -:  371:                {
+      119:  372:                    key = keymap[i].key;
+      119:  373:                    break;
+      119:  373-block  0
+        -:  374:                }
+        -:  375:            }
+        -:  376:
+        -:  377:            // Fall back to key aliases in case the key name did not match
+     4474:  378:            for (int i = 0;  i < desc->names->num_key_aliases;  i++)
+      248:  378-block  0
+     4226:  378-block  1
+     4474:  378-block  2
+        -:  379:            {
+     4346:  380:                if (key != GLFW_KEY_UNKNOWN)
+     4346:  380-block  0
+      120:  381:                    break;
+      120:  381-block  0
+        -:  382:
+     4226:  383:                if (strncmp(desc->names->key_aliases[i].real,
+     4226:  384:                            desc->names->keys[scancode].name,
+     4226:  384-block  0
+        -:  385:                            XkbKeyNameLength) != 0)
+        -:  386:                {
+     4224:  387:                    continue;
+     4224:  387-block  0
+        -:  388:                }
+        -:  389:
+      243:  390:                for (int j = 0;  j < sizeof(keymap) / sizeof(keymap[0]);  j++)
+        2:  390-block  0
+      241:  390-block  1
+      243:  390-block  2
+        -:  391:                {
+      242:  392:                    if (strncmp(desc->names->key_aliases[i].alias,
+      242:  393:                                keymap[j].name,
+      242:  393-block  0
+        -:  394:                                XkbKeyNameLength) == 0)
+        -:  395:                    {
+        1:  396:                        key = keymap[j].key;
+        1:  397:                        break;
+        1:  397-block  0
+        -:  398:                    }
+        -:  399:                }
+        -:  400:            }
+        -:  401:
+      248:  402:            _glfw.x11.keycodes[scancode] = key;
+      248:  402-block  0
+        -:  403:        }
+        -:  404:
+        1:  405:        XkbFreeNames(desc, XkbKeyNamesMask, True);
+        1:  405-block  0
+        1:  406:        XkbFreeKeyboard(desc, 0, True);
+        -:  407:    }
+        -:  408:    else
+    #####:  409:        XDisplayKeycodes(_glfw.x11.display, &scancodeMin, &scancodeMax);
+    %%%%%:  409-block  0
+        -:  410:
+        -:  411:    int width;
+        1:  412:    KeySym* keysyms = XGetKeyboardMapping(_glfw.x11.display,
+        -:  413:                                          scancodeMin,
+        1:  414:                                          scancodeMax - scancodeMin + 1,
+        1:  414-block  0
+        -:  415:                                          &width);
+        -:  416:
+      249:  417:    for (scancode = scancodeMin;  scancode <= scancodeMax;  scancode++)
+      248:  417-block  0
+      249:  417-block  1
+        -:  418:    {
+        -:  419:        // Translate the un-translated key codes using traditional X11 KeySym
+        -:  420:        // lookups
+      248:  421:        if (_glfw.x11.keycodes[scancode] < 0)
+      248:  421-block  0
+        -:  422:        {
+      128:  423:            const size_t base = (scancode - scancodeMin) * width;
+      128:  424:            _glfw.x11.keycodes[scancode] = translateKeySyms(&keysyms[base], width);
+      128:  424-block  0
+        -:  425:        }
+        -:  426:
+        -:  427:        // Store the reverse translation for faster key name lookup
+      248:  428:        if (_glfw.x11.keycodes[scancode] > 0)
+      248:  428-block  0
+      122:  429:            _glfw.x11.scancodes[_glfw.x11.keycodes[scancode]] = scancode;
+      122:  429-block  0
+        -:  430:    }
+        -:  431:
+        1:  432:    XFree(keysyms);
+        1:  432-block  0
+        1:  433:}
+        -:  434:
+        -:  435:// Check whether the IM has a usable style
+        -:  436://
+        1:  437:static GLFWbool hasUsableInputMethodStyle(void)
+        -:  438:{
+        1:  439:    GLFWbool found = GLFW_FALSE;
+        1:  440:    XIMStyles* styles = NULL;
+        -:  441:
+        1:  442:    if (XGetIMValues(_glfw.x11.im, XNQueryInputStyle, &styles, NULL) != NULL)
+        1:  442-block  0
+    #####:  443:        return GLFW_FALSE;
+    %%%%%:  443-block  0
+        -:  444:
+        3:  445:    for (unsigned int i = 0;  i < styles->count_styles;  i++)
+        1:  445-block  0
+        2:  445-block  1
+        3:  445-block  2
+        -:  446:    {
+        3:  447:        if (styles->supported_styles[i] == (XIMPreeditNothing | XIMStatusNothing))
+        3:  447-block  0
+        -:  448:        {
+        1:  449:            found = GLFW_TRUE;
+        1:  450:            break;
+        1:  450-block  0
+        -:  451:        }
+        -:  452:    }
+        -:  453:
+        1:  454:    XFree(styles);
+        1:  454-block  0
+        1:  455:    return found;
+        -:  456:}
+        -:  457:
+    #####:  458:static void inputMethodDestroyCallback(XIM im, XPointer clientData, XPointer callData)
+        -:  459:{
+    #####:  460:    _glfw.x11.im = NULL;
+    #####:  461:}
+        -:  462:
+        1:  463:static void inputMethodInstantiateCallback(Display* display,
+        -:  464:                                           XPointer clientData,
+        -:  465:                                           XPointer callData)
+        -:  466:{
+        1:  467:    if (_glfw.x11.im)
+        1:  467-block  0
+    #####:  468:        return;
+    %%%%%:  468-block  0
+        -:  469:
+        1:  470:    _glfw.x11.im = XOpenIM(_glfw.x11.display, 0, NULL, NULL);
+        1:  470-block  0
+        1:  471:    if (_glfw.x11.im)
+        -:  472:    {
+        1:  473:        if (!hasUsableInputMethodStyle())
+        1:  473-block  0
+        -:  474:        {
+    #####:  475:            XCloseIM(_glfw.x11.im);
+    %%%%%:  475-block  0
+    #####:  476:            _glfw.x11.im = NULL;
+        -:  477:        }
+        -:  478:    }
+        -:  479:
+        1:  480:    if (_glfw.x11.im)
+        1:  480-block  0
+        -:  481:    {
+        -:  482:        XIMCallback callback;
+        1:  483:        callback.callback = (XIMProc) inputMethodDestroyCallback;
+        1:  484:        callback.client_data = NULL;
+        1:  485:        XSetIMValues(_glfw.x11.im, XNDestroyCallback, &callback, NULL);
+        1:  485-block  0
+        -:  486:
+       1*:  487:        for (_GLFWwindow* window = _glfw.windowListHead;  window;  window = window->next)
+        1:  487-block  0
+    #####:  488:            _glfwCreateInputContextX11(window);
+    %%%%%:  488-block  0
+        -:  489:    }
+        -:  490:}
+        -:  491:
+        -:  492:// Return the atom ID only if it is listed in the specified array
+        -:  493://
+       14:  494:static Atom getAtomIfSupported(Atom* supportedAtoms,
+        -:  495:                               unsigned long atomCount,
+        -:  496:                               const char* atomName)
+        -:  497:{
+       14:  498:    const Atom atom = XInternAtom(_glfw.x11.display, atomName, False);
+       14:  498-block  0
+        -:  499:
+      464:  500:    for (unsigned long i = 0;  i < atomCount;  i++)
+      450:  500-block  0
+      464:  500-block  1
+        -:  501:    {
+      464:  502:        if (supportedAtoms[i] == atom)
+      464:  502-block  0
+       14:  503:            return atom;
+       14:  503-block  0
+        -:  504:    }
+        -:  505:
+    #####:  506:    return None;
+    %%%%%:  506-block  0
+        -:  507:}
+        -:  508:
+        -:  509:// Check whether the running window manager is EWMH-compliant
+        -:  510://
+        1:  511:static void detectEWMH(void)
+        -:  512:{
+        -:  513:    // First we read the _NET_SUPPORTING_WM_CHECK property on the root window
+        -:  514:
+        1:  515:    Window* windowFromRoot = NULL;
+        1:  516:    if (!_glfwGetWindowPropertyX11(_glfw.x11.root,
+        1:  516-block  0
+        -:  517:                                   _glfw.x11.NET_SUPPORTING_WM_CHECK,
+        -:  518:                                   XA_WINDOW,
+        -:  519:                                   (unsigned char**) &windowFromRoot))
+        -:  520:    {
+    #####:  521:        return;
+    %%%%%:  521-block  0
+    %%%%%:  521-block  1
+        -:  522:    }
+        -:  523:
+        1:  524:    _glfwGrabErrorHandlerX11();
+        1:  524-block  0
+        -:  525:
+        -:  526:    // If it exists, it should be the XID of a top-level window
+        -:  527:    // Then we look for the same property on that window
+        -:  528:
+        1:  529:    Window* windowFromChild = NULL;
+        1:  530:    if (!_glfwGetWindowPropertyX11(*windowFromRoot,
+        -:  531:                                   _glfw.x11.NET_SUPPORTING_WM_CHECK,
+        -:  532:                                   XA_WINDOW,
+        -:  533:                                   (unsigned char**) &windowFromChild))
+        -:  534:    {
+    #####:  535:        XFree(windowFromRoot);
+    %%%%%:  535-block  0
+    #####:  536:        return;
+        -:  537:    }
+        -:  538:
+        1:  539:    _glfwReleaseErrorHandlerX11();
+        1:  539-block  0
+        -:  540:
+        -:  541:    // If the property exists, it should contain the XID of the window
+        -:  542:
+        1:  543:    if (*windowFromRoot != *windowFromChild)
+        -:  544:    {
+    #####:  545:        XFree(windowFromRoot);
+    %%%%%:  545-block  0
+    #####:  546:        XFree(windowFromChild);
+    #####:  547:        return;
+        -:  548:    }
+        -:  549:
+        1:  550:    XFree(windowFromRoot);
+        1:  550-block  0
+        1:  551:    XFree(windowFromChild);
+        -:  552:
+        -:  553:    // We are now fairly sure that an EWMH-compliant WM is currently running
+        -:  554:    // We can now start querying the WM about what features it supports by
+        -:  555:    // looking in the _NET_SUPPORTED property on the root window
+        -:  556:    // It should contain a list of supported EWMH protocol and state atoms
+        -:  557:
+        1:  558:    Atom* supportedAtoms = NULL;
+        -:  559:    const unsigned long atomCount =
+        1:  560:        _glfwGetWindowPropertyX11(_glfw.x11.root,
+        -:  561:                                  _glfw.x11.NET_SUPPORTED,
+        -:  562:                                  XA_ATOM,
+        -:  563:                                  (unsigned char**) &supportedAtoms);
+        -:  564:
+        -:  565:    // See which of the atoms we support that are supported by the WM
+        -:  566:
+        1:  567:    _glfw.x11.NET_WM_STATE =
+        1:  568:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_STATE");
+        1:  569:    _glfw.x11.NET_WM_STATE_ABOVE =
+        1:  570:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_STATE_ABOVE");
+        1:  571:    _glfw.x11.NET_WM_STATE_FULLSCREEN =
+        1:  572:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_STATE_FULLSCREEN");
+        1:  573:    _glfw.x11.NET_WM_STATE_MAXIMIZED_VERT =
+        1:  574:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_STATE_MAXIMIZED_VERT");
+        1:  575:    _glfw.x11.NET_WM_STATE_MAXIMIZED_HORZ =
+        1:  576:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_STATE_MAXIMIZED_HORZ");
+        1:  577:    _glfw.x11.NET_WM_STATE_DEMANDS_ATTENTION =
+        1:  578:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_STATE_DEMANDS_ATTENTION");
+        1:  579:    _glfw.x11.NET_WM_FULLSCREEN_MONITORS =
+        1:  580:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_FULLSCREEN_MONITORS");
+        1:  581:    _glfw.x11.NET_WM_WINDOW_TYPE =
+        1:  582:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_WINDOW_TYPE");
+        1:  583:    _glfw.x11.NET_WM_WINDOW_TYPE_NORMAL =
+        1:  584:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WM_WINDOW_TYPE_NORMAL");
+        1:  585:    _glfw.x11.NET_WORKAREA =
+        1:  586:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_WORKAREA");
+        1:  587:    _glfw.x11.NET_CURRENT_DESKTOP =
+        1:  588:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_CURRENT_DESKTOP");
+        1:  589:    _glfw.x11.NET_ACTIVE_WINDOW =
+        1:  590:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_ACTIVE_WINDOW");
+        1:  591:    _glfw.x11.NET_FRAME_EXTENTS =
+        1:  592:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_FRAME_EXTENTS");
+        1:  593:    _glfw.x11.NET_REQUEST_FRAME_EXTENTS =
+        1:  594:        getAtomIfSupported(supportedAtoms, atomCount, "_NET_REQUEST_FRAME_EXTENTS");
+        -:  595:
+        1:  596:    if (supportedAtoms)
+        1:  597:        XFree(supportedAtoms);
+        1:  597-block  0
+        -:  598:}
+        -:  599:
+        -:  600:// Look for and initialize supported X11 extensions
+        -:  601://
+        1:  602:static GLFWbool initExtensions(void)
+        -:  603:{
+        1:  604:    _glfw.x11.vidmode.handle = _glfw_dlopen("libXxf86vm.so.1");
+        1:  604-block  0
+        1:  605:    if (_glfw.x11.vidmode.handle)
+        -:  606:    {
+        1:  607:        _glfw.x11.vidmode.QueryExtension = (PFN_XF86VidModeQueryExtension)
+        1:  608:            _glfw_dlsym(_glfw.x11.vidmode.handle, "XF86VidModeQueryExtension");
+        1:  608-block  0
+        1:  609:        _glfw.x11.vidmode.GetGammaRamp = (PFN_XF86VidModeGetGammaRamp)
+        1:  610:            _glfw_dlsym(_glfw.x11.vidmode.handle, "XF86VidModeGetGammaRamp");
+        1:  611:        _glfw.x11.vidmode.SetGammaRamp = (PFN_XF86VidModeSetGammaRamp)
+        1:  612:            _glfw_dlsym(_glfw.x11.vidmode.handle, "XF86VidModeSetGammaRamp");
+        1:  613:        _glfw.x11.vidmode.GetGammaRampSize = (PFN_XF86VidModeGetGammaRampSize)
+        1:  614:            _glfw_dlsym(_glfw.x11.vidmode.handle, "XF86VidModeGetGammaRampSize");
+        -:  615:
+        1:  616:        _glfw.x11.vidmode.available =
+        1:  617:            XF86VidModeQueryExtension(_glfw.x11.display,
+        -:  618:                                      &_glfw.x11.vidmode.eventBase,
+        -:  619:                                      &_glfw.x11.vidmode.errorBase);
+        -:  620:    }
+        -:  621:
+        -:  622:#if defined(__CYGWIN__)
+        -:  623:    _glfw.x11.xi.handle = _glfw_dlopen("libXi-6.so");
+        -:  624:#else
+        1:  625:    _glfw.x11.xi.handle = _glfw_dlopen("libXi.so.6");
+        1:  625-block  0
+        -:  626:#endif
+        1:  627:    if (_glfw.x11.xi.handle)
+        -:  628:    {
+        1:  629:        _glfw.x11.xi.QueryVersion = (PFN_XIQueryVersion)
+        1:  630:            _glfw_dlsym(_glfw.x11.xi.handle, "XIQueryVersion");
+        1:  630-block  0
+        1:  631:        _glfw.x11.xi.SelectEvents = (PFN_XISelectEvents)
+        1:  632:            _glfw_dlsym(_glfw.x11.xi.handle, "XISelectEvents");
+        -:  633:
+        1:  634:        if (XQueryExtension(_glfw.x11.display,
+        -:  635:                            "XInputExtension",
+        -:  636:                            &_glfw.x11.xi.majorOpcode,
+        -:  637:                            &_glfw.x11.xi.eventBase,
+        -:  638:                            &_glfw.x11.xi.errorBase))
+        -:  639:        {
+        1:  640:            _glfw.x11.xi.major = 2;
+        1:  641:            _glfw.x11.xi.minor = 0;
+        -:  642:
+        1:  643:            if (XIQueryVersion(_glfw.x11.display,
+        1:  643-block  0
+        -:  644:                               &_glfw.x11.xi.major,
+        -:  645:                               &_glfw.x11.xi.minor) == Success)
+        -:  646:            {
+        1:  647:                _glfw.x11.xi.available = GLFW_TRUE;
+        1:  647-block  0
+        -:  648:            }
+        -:  649:        }
+        -:  650:    }
+        -:  651:
+        -:  652:#if defined(__CYGWIN__)
+        -:  653:    _glfw.x11.randr.handle = _glfw_dlopen("libXrandr-2.so");
+        -:  654:#else
+        1:  655:    _glfw.x11.randr.handle = _glfw_dlopen("libXrandr.so.2");
+        1:  655-block  0
+        -:  656:#endif
+        1:  657:    if (_glfw.x11.randr.handle)
+        -:  658:    {
+        1:  659:        _glfw.x11.randr.AllocGamma = (PFN_XRRAllocGamma)
+        1:  660:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRAllocGamma");
+        1:  660-block  0
+        1:  661:        _glfw.x11.randr.FreeGamma = (PFN_XRRFreeGamma)
+        1:  662:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRFreeGamma");
+        1:  663:        _glfw.x11.randr.FreeCrtcInfo = (PFN_XRRFreeCrtcInfo)
+        1:  664:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRFreeCrtcInfo");
+        1:  665:        _glfw.x11.randr.FreeGamma = (PFN_XRRFreeGamma)
+        1:  666:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRFreeGamma");
+        1:  667:        _glfw.x11.randr.FreeOutputInfo = (PFN_XRRFreeOutputInfo)
+        1:  668:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRFreeOutputInfo");
+        1:  669:        _glfw.x11.randr.FreeScreenResources = (PFN_XRRFreeScreenResources)
+        1:  670:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRFreeScreenResources");
+        1:  671:        _glfw.x11.randr.GetCrtcGamma = (PFN_XRRGetCrtcGamma)
+        1:  672:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRGetCrtcGamma");
+        1:  673:        _glfw.x11.randr.GetCrtcGammaSize = (PFN_XRRGetCrtcGammaSize)
+        1:  674:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRGetCrtcGammaSize");
+        1:  675:        _glfw.x11.randr.GetCrtcInfo = (PFN_XRRGetCrtcInfo)
+        1:  676:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRGetCrtcInfo");
+        1:  677:        _glfw.x11.randr.GetOutputInfo = (PFN_XRRGetOutputInfo)
+        1:  678:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRGetOutputInfo");
+        1:  679:        _glfw.x11.randr.GetOutputPrimary = (PFN_XRRGetOutputPrimary)
+        1:  680:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRGetOutputPrimary");
+        1:  681:        _glfw.x11.randr.GetScreenResourcesCurrent = (PFN_XRRGetScreenResourcesCurrent)
+        1:  682:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRGetScreenResourcesCurrent");
+        1:  683:        _glfw.x11.randr.QueryExtension = (PFN_XRRQueryExtension)
+        1:  684:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRQueryExtension");
+        1:  685:        _glfw.x11.randr.QueryVersion = (PFN_XRRQueryVersion)
+        1:  686:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRQueryVersion");
+        1:  687:        _glfw.x11.randr.SelectInput = (PFN_XRRSelectInput)
+        1:  688:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRSelectInput");
+        1:  689:        _glfw.x11.randr.SetCrtcConfig = (PFN_XRRSetCrtcConfig)
+        1:  690:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRSetCrtcConfig");
+        1:  691:        _glfw.x11.randr.SetCrtcGamma = (PFN_XRRSetCrtcGamma)
+        1:  692:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRSetCrtcGamma");
+        1:  693:        _glfw.x11.randr.UpdateConfiguration = (PFN_XRRUpdateConfiguration)
+        1:  694:            _glfw_dlsym(_glfw.x11.randr.handle, "XRRUpdateConfiguration");
+        -:  695:
+        1:  696:        if (XRRQueryExtension(_glfw.x11.display,
+        -:  697:                              &_glfw.x11.randr.eventBase,
+        -:  698:                              &_glfw.x11.randr.errorBase))
+        -:  699:        {
+        1:  700:            if (XRRQueryVersion(_glfw.x11.display,
+        1:  700-block  0
+        -:  701:                                &_glfw.x11.randr.major,
+        -:  702:                                &_glfw.x11.randr.minor))
+        -:  703:            {
+        -:  704:                // The GLFW RandR path requires at least version 1.3
+        1:  705:                if (_glfw.x11.randr.major > 1 || _glfw.x11.randr.minor >= 3)
+        1:  705-block  0
+        1:  705-block  1
+        1:  706:                    _glfw.x11.randr.available = GLFW_TRUE;
+        1:  706-block  0
+        -:  707:            }
+        -:  708:            else
+        -:  709:            {
+    #####:  710:                _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%:  710-block  0
+        -:  711:                                "X11: Failed to query RandR version");
+        -:  712:            }
+        -:  713:        }
+        -:  714:    }
+        -:  715:
+        1:  716:    if (_glfw.x11.randr.available)
+        1:  716-block  0
+        -:  717:    {
+        1:  718:        XRRScreenResources* sr = XRRGetScreenResourcesCurrent(_glfw.x11.display,
+        1:  718-block  0
+        -:  719:                                                              _glfw.x11.root);
+        -:  720:
+        1:  721:        if (!sr->ncrtc || !XRRGetCrtcGammaSize(_glfw.x11.display, sr->crtcs[0]))
+        1:  721-block  0
+        -:  722:        {
+        -:  723:            // This is likely an older Nvidia driver with broken gamma support
+        -:  724:            // Flag it as useless and fall back to xf86vm gamma, if available
+    #####:  725:            _glfw.x11.randr.gammaBroken = GLFW_TRUE;
+    %%%%%:  725-block  0
+        -:  726:        }
+        -:  727:
+        1:  728:        if (!sr->ncrtc)
+        1:  728-block  0
+        -:  729:        {
+        -:  730:            // A system without CRTCs is likely a system with broken RandR
+        -:  731:            // Disable the RandR monitor path and fall back to core functions
+    #####:  732:            _glfw.x11.randr.monitorBroken = GLFW_TRUE;
+    %%%%%:  732-block  0
+        -:  733:        }
+        -:  734:
+        1:  735:        XRRFreeScreenResources(sr);
+        1:  735-block  0
+        -:  736:    }
+        -:  737:
+        1:  738:    if (_glfw.x11.randr.available && !_glfw.x11.randr.monitorBroken)
+        1:  738-block  0
+        1:  738-block  1
+        -:  739:    {
+        1:  740:        XRRSelectInput(_glfw.x11.display, _glfw.x11.root,
+        1:  740-block  0
+        -:  741:                       RROutputChangeNotifyMask);
+        -:  742:    }
+        -:  743:
+        -:  744:#if defined(__CYGWIN__)
+        -:  745:    _glfw.x11.xcursor.handle = _glfw_dlopen("libXcursor-1.so");
+        -:  746:#else
+        1:  747:    _glfw.x11.xcursor.handle = _glfw_dlopen("libXcursor.so.1");
+        1:  747-block  0
+        -:  748:#endif
+        1:  749:    if (_glfw.x11.xcursor.handle)
+        -:  750:    {
+        1:  751:        _glfw.x11.xcursor.ImageCreate = (PFN_XcursorImageCreate)
+        1:  752:            _glfw_dlsym(_glfw.x11.xcursor.handle, "XcursorImageCreate");
+        1:  752-block  0
+        1:  753:        _glfw.x11.xcursor.ImageDestroy = (PFN_XcursorImageDestroy)
+        1:  754:            _glfw_dlsym(_glfw.x11.xcursor.handle, "XcursorImageDestroy");
+        1:  755:        _glfw.x11.xcursor.ImageLoadCursor = (PFN_XcursorImageLoadCursor)
+        1:  756:            _glfw_dlsym(_glfw.x11.xcursor.handle, "XcursorImageLoadCursor");
+        1:  757:        _glfw.x11.xcursor.GetTheme = (PFN_XcursorGetTheme)
+        1:  758:            _glfw_dlsym(_glfw.x11.xcursor.handle, "XcursorGetTheme");
+        1:  759:        _glfw.x11.xcursor.GetDefaultSize = (PFN_XcursorGetDefaultSize)
+        1:  760:            _glfw_dlsym(_glfw.x11.xcursor.handle, "XcursorGetDefaultSize");
+        1:  761:        _glfw.x11.xcursor.LibraryLoadImage = (PFN_XcursorLibraryLoadImage)
+        1:  762:            _glfw_dlsym(_glfw.x11.xcursor.handle, "XcursorLibraryLoadImage");
+        -:  763:    }
+        -:  764:
+        -:  765:#if defined(__CYGWIN__)
+        -:  766:    _glfw.x11.xinerama.handle = _glfw_dlopen("libXinerama-1.so");
+        -:  767:#else
+        1:  768:    _glfw.x11.xinerama.handle = _glfw_dlopen("libXinerama.so.1");
+        1:  768-block  0
+        -:  769:#endif
+        1:  770:    if (_glfw.x11.xinerama.handle)
+        -:  771:    {
+        1:  772:        _glfw.x11.xinerama.IsActive = (PFN_XineramaIsActive)
+        1:  773:            _glfw_dlsym(_glfw.x11.xinerama.handle, "XineramaIsActive");
+        1:  773-block  0
+        1:  774:        _glfw.x11.xinerama.QueryExtension = (PFN_XineramaQueryExtension)
+        1:  775:            _glfw_dlsym(_glfw.x11.xinerama.handle, "XineramaQueryExtension");
+        1:  776:        _glfw.x11.xinerama.QueryScreens = (PFN_XineramaQueryScreens)
+        1:  777:            _glfw_dlsym(_glfw.x11.xinerama.handle, "XineramaQueryScreens");
+        -:  778:
+        1:  779:        if (XineramaQueryExtension(_glfw.x11.display,
+        -:  780:                                   &_glfw.x11.xinerama.major,
+        -:  781:                                   &_glfw.x11.xinerama.minor))
+        -:  782:        {
+        1:  783:            if (XineramaIsActive(_glfw.x11.display))
+        1:  783-block  0
+        1:  784:                _glfw.x11.xinerama.available = GLFW_TRUE;
+        1:  784-block  0
+        -:  785:        }
+        -:  786:    }
+        -:  787:
+        1:  788:    _glfw.x11.xkb.major = 1;
+        1:  789:    _glfw.x11.xkb.minor = 0;
+        1:  790:    _glfw.x11.xkb.available =
+        1:  791:        XkbQueryExtension(_glfw.x11.display,
+        1:  791-block  0
+        -:  792:                          &_glfw.x11.xkb.majorOpcode,
+        -:  793:                          &_glfw.x11.xkb.eventBase,
+        -:  794:                          &_glfw.x11.xkb.errorBase,
+        -:  795:                          &_glfw.x11.xkb.major,
+        -:  796:                          &_glfw.x11.xkb.minor);
+        -:  797:
+        1:  798:    if (_glfw.x11.xkb.available)
+        -:  799:    {
+        -:  800:        Bool supported;
+        -:  801:
+        1:  802:        if (XkbSetDetectableAutoRepeat(_glfw.x11.display, True, &supported))
+        1:  802-block  0
+        -:  803:        {
+        1:  804:            if (supported)
+        1:  804-block  0
+        1:  805:                _glfw.x11.xkb.detectable = GLFW_TRUE;
+        1:  805-block  0
+        -:  806:        }
+        -:  807:
+        -:  808:        XkbStateRec state;
+        1:  809:        if (XkbGetState(_glfw.x11.display, XkbUseCoreKbd, &state) == Success)
+        1:  809-block  0
+        1:  810:            _glfw.x11.xkb.group = (unsigned int)state.group;
+        1:  810-block  0
+        -:  811:
+        1:  812:        XkbSelectEventDetails(_glfw.x11.display, XkbUseCoreKbd, XkbStateNotify,
+        1:  812-block  0
+        -:  813:                              XkbGroupStateMask, XkbGroupStateMask);
+        -:  814:    }
+        -:  815:
+        -:  816:#if defined(__CYGWIN__)
+        -:  817:    _glfw.x11.x11xcb.handle = _glfw_dlopen("libX11-xcb-1.so");
+        -:  818:#else
+        1:  819:    _glfw.x11.x11xcb.handle = _glfw_dlopen("libX11-xcb.so.1");
+        1:  819-block  0
+        -:  820:#endif
+        1:  821:    if (_glfw.x11.x11xcb.handle)
+        -:  822:    {
+        1:  823:        _glfw.x11.x11xcb.GetXCBConnection = (PFN_XGetXCBConnection)
+        1:  824:            _glfw_dlsym(_glfw.x11.x11xcb.handle, "XGetXCBConnection");
+        1:  824-block  0
+        -:  825:    }
+        -:  826:
+        -:  827:#if defined(__CYGWIN__)
+        -:  828:    _glfw.x11.xrender.handle = _glfw_dlopen("libXrender-1.so");
+        -:  829:#else
+        1:  830:    _glfw.x11.xrender.handle = _glfw_dlopen("libXrender.so.1");
+        1:  830-block  0
+        -:  831:#endif
+        1:  832:    if (_glfw.x11.xrender.handle)
+        -:  833:    {
+        1:  834:        _glfw.x11.xrender.QueryExtension = (PFN_XRenderQueryExtension)
+        1:  835:            _glfw_dlsym(_glfw.x11.xrender.handle, "XRenderQueryExtension");
+        1:  835-block  0
+        1:  836:        _glfw.x11.xrender.QueryVersion = (PFN_XRenderQueryVersion)
+        1:  837:            _glfw_dlsym(_glfw.x11.xrender.handle, "XRenderQueryVersion");
+        1:  838:        _glfw.x11.xrender.FindVisualFormat = (PFN_XRenderFindVisualFormat)
+        1:  839:            _glfw_dlsym(_glfw.x11.xrender.handle, "XRenderFindVisualFormat");
+        -:  840:
+        1:  841:        if (XRenderQueryExtension(_glfw.x11.display,
+        -:  842:                                  &_glfw.x11.xrender.errorBase,
+        -:  843:                                  &_glfw.x11.xrender.eventBase))
+        -:  844:        {
+        1:  845:            if (XRenderQueryVersion(_glfw.x11.display,
+        1:  845-block  0
+        -:  846:                                    &_glfw.x11.xrender.major,
+        -:  847:                                    &_glfw.x11.xrender.minor))
+        -:  848:            {
+        1:  849:                _glfw.x11.xrender.available = GLFW_TRUE;
+        1:  849-block  0
+        -:  850:            }
+        -:  851:        }
+        -:  852:    }
+        -:  853:
+        -:  854:#if defined(__CYGWIN__)
+        -:  855:    _glfw.x11.xshape.handle = _glfw_dlopen("libXext-6.so");
+        -:  856:#else
+        1:  857:    _glfw.x11.xshape.handle = _glfw_dlopen("libXext.so.6");
+        1:  857-block  0
+        -:  858:#endif
+        1:  859:    if (_glfw.x11.xshape.handle)
+        -:  860:    {
+        1:  861:        _glfw.x11.xshape.QueryExtension = (PFN_XShapeQueryExtension)
+        1:  862:            _glfw_dlsym(_glfw.x11.xshape.handle, "XShapeQueryExtension");
+        1:  862-block  0
+        1:  863:        _glfw.x11.xshape.ShapeCombineRegion = (PFN_XShapeCombineRegion)
+        1:  864:            _glfw_dlsym(_glfw.x11.xshape.handle, "XShapeCombineRegion");
+        1:  865:        _glfw.x11.xshape.QueryVersion = (PFN_XShapeQueryVersion)
+        1:  866:            _glfw_dlsym(_glfw.x11.xshape.handle, "XShapeQueryVersion");
+        1:  867:        _glfw.x11.xshape.ShapeCombineMask = (PFN_XShapeCombineMask)
+        1:  868:            _glfw_dlsym(_glfw.x11.xshape.handle, "XShapeCombineMask");
+        -:  869:
+        1:  870:        if (XShapeQueryExtension(_glfw.x11.display,
+        -:  871:            &_glfw.x11.xshape.errorBase,
+        -:  872:            &_glfw.x11.xshape.eventBase))
+        -:  873:        {
+        1:  874:            if (XShapeQueryVersion(_glfw.x11.display,
+        1:  874-block  0
+        -:  875:                &_glfw.x11.xshape.major,
+        -:  876:                &_glfw.x11.xshape.minor))
+        -:  877:            {
+        1:  878:                _glfw.x11.xshape.available = GLFW_TRUE;
+        1:  878-block  0
+        -:  879:            }
+        -:  880:        }
+        -:  881:    }
+        -:  882:
+        -:  883:    // Update the key code LUT
+        -:  884:    // FIXME: We should listen to XkbMapNotify events to track changes to
+        -:  885:    // the keyboard mapping.
+        1:  886:    createKeyTables();
+        1:  886-block  0
+        -:  887:
+        -:  888:    // String format atoms
+        1:  889:    _glfw.x11.NULL_ = XInternAtom(_glfw.x11.display, "NULL", False);
+        1:  890:    _glfw.x11.UTF8_STRING = XInternAtom(_glfw.x11.display, "UTF8_STRING", False);
+        1:  891:    _glfw.x11.ATOM_PAIR = XInternAtom(_glfw.x11.display, "ATOM_PAIR", False);
+        -:  892:
+        -:  893:    // Custom selection property atom
+        1:  894:    _glfw.x11.GLFW_SELECTION =
+        1:  895:        XInternAtom(_glfw.x11.display, "GLFW_SELECTION", False);
+        -:  896:
+        -:  897:    // ICCCM standard clipboard atoms
+        1:  898:    _glfw.x11.TARGETS = XInternAtom(_glfw.x11.display, "TARGETS", False);
+        1:  899:    _glfw.x11.MULTIPLE = XInternAtom(_glfw.x11.display, "MULTIPLE", False);
+        1:  900:    _glfw.x11.PRIMARY = XInternAtom(_glfw.x11.display, "PRIMARY", False);
+        1:  901:    _glfw.x11.INCR = XInternAtom(_glfw.x11.display, "INCR", False);
+        1:  902:    _glfw.x11.CLIPBOARD = XInternAtom(_glfw.x11.display, "CLIPBOARD", False);
+        -:  903:
+        -:  904:    // Clipboard manager atoms
+        1:  905:    _glfw.x11.CLIPBOARD_MANAGER =
+        1:  906:        XInternAtom(_glfw.x11.display, "CLIPBOARD_MANAGER", False);
+        1:  907:    _glfw.x11.SAVE_TARGETS =
+        1:  908:        XInternAtom(_glfw.x11.display, "SAVE_TARGETS", False);
+        -:  909:
+        -:  910:    // Xdnd (drag and drop) atoms
+        1:  911:    _glfw.x11.XdndAware = XInternAtom(_glfw.x11.display, "XdndAware", False);
+        1:  912:    _glfw.x11.XdndEnter = XInternAtom(_glfw.x11.display, "XdndEnter", False);
+        1:  913:    _glfw.x11.XdndPosition = XInternAtom(_glfw.x11.display, "XdndPosition", False);
+        1:  914:    _glfw.x11.XdndStatus = XInternAtom(_glfw.x11.display, "XdndStatus", False);
+        1:  915:    _glfw.x11.XdndActionCopy = XInternAtom(_glfw.x11.display, "XdndActionCopy", False);
+        1:  916:    _glfw.x11.XdndDrop = XInternAtom(_glfw.x11.display, "XdndDrop", False);
+        1:  917:    _glfw.x11.XdndFinished = XInternAtom(_glfw.x11.display, "XdndFinished", False);
+        1:  918:    _glfw.x11.XdndSelection = XInternAtom(_glfw.x11.display, "XdndSelection", False);
+        1:  919:    _glfw.x11.XdndTypeList = XInternAtom(_glfw.x11.display, "XdndTypeList", False);
+        1:  920:    _glfw.x11.text_uri_list = XInternAtom(_glfw.x11.display, "text/uri-list", False);
+        -:  921:
+        -:  922:    // ICCCM, EWMH and Motif window property atoms
+        -:  923:    // These can be set safely even without WM support
+        -:  924:    // The EWMH atoms that require WM support are handled in detectEWMH
+        1:  925:    _glfw.x11.WM_PROTOCOLS =
+        1:  926:        XInternAtom(_glfw.x11.display, "WM_PROTOCOLS", False);
+        1:  927:    _glfw.x11.WM_STATE =
+        1:  928:        XInternAtom(_glfw.x11.display, "WM_STATE", False);
+        1:  929:    _glfw.x11.WM_DELETE_WINDOW =
+        1:  930:        XInternAtom(_glfw.x11.display, "WM_DELETE_WINDOW", False);
+        1:  931:    _glfw.x11.NET_SUPPORTED =
+        1:  932:        XInternAtom(_glfw.x11.display, "_NET_SUPPORTED", False);
+        1:  933:    _glfw.x11.NET_SUPPORTING_WM_CHECK =
+        1:  934:        XInternAtom(_glfw.x11.display, "_NET_SUPPORTING_WM_CHECK", False);
+        1:  935:    _glfw.x11.NET_WM_ICON =
+        1:  936:        XInternAtom(_glfw.x11.display, "_NET_WM_ICON", False);
+        1:  937:    _glfw.x11.NET_WM_PING =
+        1:  938:        XInternAtom(_glfw.x11.display, "_NET_WM_PING", False);
+        1:  939:    _glfw.x11.NET_WM_PID =
+        1:  940:        XInternAtom(_glfw.x11.display, "_NET_WM_PID", False);
+        1:  941:    _glfw.x11.NET_WM_NAME =
+        1:  942:        XInternAtom(_glfw.x11.display, "_NET_WM_NAME", False);
+        1:  943:    _glfw.x11.NET_WM_ICON_NAME =
+        1:  944:        XInternAtom(_glfw.x11.display, "_NET_WM_ICON_NAME", False);
+        1:  945:    _glfw.x11.NET_WM_BYPASS_COMPOSITOR =
+        1:  946:        XInternAtom(_glfw.x11.display, "_NET_WM_BYPASS_COMPOSITOR", False);
+        1:  947:    _glfw.x11.NET_WM_WINDOW_OPACITY =
+        1:  948:        XInternAtom(_glfw.x11.display, "_NET_WM_WINDOW_OPACITY", False);
+        1:  949:    _glfw.x11.MOTIF_WM_HINTS =
+        1:  950:        XInternAtom(_glfw.x11.display, "_MOTIF_WM_HINTS", False);
+        -:  951:
+        -:  952:    // The compositing manager selection name contains the screen number
+        -:  953:    {
+        -:  954:        char name[32];
+        1:  955:        snprintf(name, sizeof(name), "_NET_WM_CM_S%u", _glfw.x11.screen);
+        1:  956:        _glfw.x11.NET_WM_CM_Sx = XInternAtom(_glfw.x11.display, name, False);
+        -:  957:    }
+        -:  958:
+        -:  959:    // Detect whether an EWMH-conformant window manager is running
+        1:  960:    detectEWMH();
+        -:  961:
+        1:  962:    return GLFW_TRUE;
+        -:  963:}
+        -:  964:
+        -:  965:// Retrieve system content scale via folklore heuristics
+        -:  966://
+        1:  967:static void getSystemContentScale(float* xscale, float* yscale)
+        -:  968:{
+        -:  969:    // Start by assuming the default X11 DPI
+        -:  970:    // NOTE: Some desktop environments (KDE) may remove the Xft.dpi field when it
+        -:  971:    //       would be set to 96, so assume that is the case if we cannot find it
+        1:  972:    float xdpi = 96.f, ydpi = 96.f;
+        -:  973:
+        -:  974:    // NOTE: Basing the scale on Xft.dpi where available should provide the most
+        -:  975:    //       consistent user experience (matches Qt, Gtk, etc), although not
+        -:  976:    //       always the most accurate one
+        1:  977:    char* rms = XResourceManagerString(_glfw.x11.display);
+        1:  977-block  0
+        1:  978:    if (rms)
+        -:  979:    {
+        1:  980:        XrmDatabase db = XrmGetStringDatabase(rms);
+        1:  980-block  0
+        1:  981:        if (db)
+        -:  982:        {
+        -:  983:            XrmValue value;
+        1:  984:            char* type = NULL;
+        -:  985:
+        1:  986:            if (XrmGetResource(db, "Xft.dpi", "Xft.Dpi", &type, &value))
+        1:  986-block  0
+        -:  987:            {
+        1:  988:                if (type && strcmp(type, "String") == 0)
+        1:  988-block  0
+        1:  988-block  1
+        1:  989:                    xdpi = ydpi = atof(value.addr);
+        1:  989-block  0
+        -:  990:            }
+        -:  991:
+        1:  992:            XrmDestroyDatabase(db);
+        1:  992-block  0
+        -:  993:        }
+        -:  994:    }
+        -:  995:
+        1:  996:    *xscale = xdpi / 96.f;
+        1:  997:    *yscale = ydpi / 96.f;
+        1:  998:}
+        -:  999:
+        -: 1000:// Create a blank cursor for hidden and disabled cursor modes
+        -: 1001://
+        1: 1002:static Cursor createHiddenCursor(void)
+        -: 1003:{
+        1: 1004:    unsigned char pixels[16 * 16 * 4] = { 0 };
+        1: 1005:    GLFWimage image = { 16, 16, pixels };
+        1: 1006:    return _glfwCreateCursorX11(&image, 0, 0);
+        1: 1006-block  0
+        -: 1007:}
+        -: 1008:
+        -: 1009:// Create a helper window for IPC
+        -: 1010://
+        1: 1011:static Window createHelperWindow(void)
+        -: 1012:{
+        -: 1013:    XSetWindowAttributes wa;
+        1: 1014:    wa.event_mask = PropertyChangeMask;
+        -: 1015:
+        2: 1016:    return XCreateWindow(_glfw.x11.display, _glfw.x11.root,
+        -: 1017:                         0, 0, 1, 1, 0, 0,
+        -: 1018:                         InputOnly,
+        1: 1019:                         DefaultVisual(_glfw.x11.display, _glfw.x11.screen),
+        1: 1019-block  0
+        -: 1020:                         CWEventMask, &wa);
+        -: 1021:}
+        -: 1022:
+        -: 1023:// X error handler
+        -: 1024://
+    #####: 1025:static int errorHandler(Display *display, XErrorEvent* event)
+        -: 1026:{
+    #####: 1027:    if (_glfw.x11.display != display)
+    %%%%%: 1027-block  0
+    #####: 1028:        return 0;
+    %%%%%: 1028-block  0
+        -: 1029:
+    #####: 1030:    _glfw.x11.errorCode = event->error_code;
+    #####: 1031:    return 0;
+    %%%%%: 1031-block  0
+        -: 1032:}
+        -: 1033:
+        -: 1034:
+        -: 1035://////////////////////////////////////////////////////////////////////////
+        -: 1036://////                       GLFW internal API                      //////
+        -: 1037://////////////////////////////////////////////////////////////////////////
+        -: 1038:
+        -: 1039:// Sets the X error handler callback
+        -: 1040://
+        4: 1041:void _glfwGrabErrorHandlerX11(void)
+        -: 1042:{
+        4: 1043:    _glfw.x11.errorCode = Success;
+        4: 1044:    XSetErrorHandler(errorHandler);
+        4: 1044-block  0
+        4: 1045:}
+        -: 1046:
+        -: 1047:// Clears the X error handler callback
+        -: 1048://
+        4: 1049:void _glfwReleaseErrorHandlerX11(void)
+        -: 1050:{
+        -: 1051:    // Synchronize to make sure all commands are processed
+        4: 1052:    XSync(_glfw.x11.display, False);
+        4: 1052-block  0
+        4: 1053:    XSetErrorHandler(NULL);
+        4: 1054:}
+        -: 1055:
+        -: 1056:// Reports the specified error, appending information about the last X error
+        -: 1057://
+    #####: 1058:void _glfwInputErrorX11(int error, const char* message)
+        -: 1059:{
+        -: 1060:    char buffer[_GLFW_MESSAGE_SIZE];
+    #####: 1061:    XGetErrorText(_glfw.x11.display, _glfw.x11.errorCode,
+    %%%%%: 1061-block  0
+        -: 1062:                  buffer, sizeof(buffer));
+        -: 1063:
+    #####: 1064:    _glfwInputError(error, "%s: %s", message, buffer);
+    #####: 1065:}
+        -: 1066:
+        -: 1067:// Creates a native cursor object from the specified image and hotspot
+        -: 1068://
+        1: 1069:Cursor _glfwCreateCursorX11(const GLFWimage* image, int xhot, int yhot)
+        -: 1070:{
+        -: 1071:    int i;
+        -: 1072:    Cursor cursor;
+        -: 1073:
+        1: 1074:    if (!_glfw.x11.xcursor.handle)
+        1: 1074-block  0
+    #####: 1075:        return None;
+    %%%%%: 1075-block  0
+        -: 1076:
+        1: 1077:    XcursorImage* native = XcursorImageCreate(image->width, image->height);
+        1: 1077-block  0
+        1: 1078:    if (native == NULL)
+    #####: 1079:        return None;
+    %%%%%: 1079-block  0
+        -: 1080:
+        1: 1081:    native->xhot = xhot;
+        1: 1082:    native->yhot = yhot;
+        -: 1083:
+        1: 1084:    unsigned char* source = (unsigned char*) image->pixels;
+        1: 1085:    XcursorPixel* target = native->pixels;
+        -: 1086:
+      257: 1087:    for (i = 0;  i < image->width * image->height;  i++, target++, source += 4)
+        1: 1087-block  0
+      257: 1087-block  1
+        -: 1088:    {
+      256: 1089:        unsigned int alpha = source[3];
+        -: 1090:
+      256: 1091:        *target = (alpha << 24) |
+      256: 1092:                  ((unsigned char) ((source[0] * alpha) / 255) << 16) |
+      256: 1093:                  ((unsigned char) ((source[1] * alpha) / 255) <<  8) |
+      256: 1094:                  ((unsigned char) ((source[2] * alpha) / 255) <<  0);
+      256: 1094-block  0
+        -: 1095:    }
+        -: 1096:
+        1: 1097:    cursor = XcursorImageLoadCursor(_glfw.x11.display, native);
+        1: 1097-block  0
+        1: 1098:    XcursorImageDestroy(native);
+        -: 1099:
+        1: 1100:    return cursor;
+        -: 1101:}
+        -: 1102:
+        -: 1103:
+        -: 1104://////////////////////////////////////////////////////////////////////////
+        -: 1105://////                       GLFW platform API                      //////
+        -: 1106://////////////////////////////////////////////////////////////////////////
+        -: 1107:
+        1: 1108:int _glfwPlatformInit(void)
+        -: 1109:{
+        -: 1110:    // HACK: If the application has left the locale as "C" then both wide
+        -: 1111:    //       character text input and explicit UTF-8 input via XIM will break
+        -: 1112:    //       This sets the CTYPE part of the current locale from the environment
+        -: 1113:    //       in the hope that it is set to something more sane than "C"
+        1: 1114:    if (strcmp(setlocale(LC_CTYPE, NULL), "C") == 0)
+        1: 1114-block  0
+        1: 1115:        setlocale(LC_CTYPE, "");
+        1: 1115-block  0
+        -: 1116:
+        -: 1117:#if defined(__CYGWIN__)
+        -: 1118:    _glfw.x11.xlib.handle = _glfw_dlopen("libX11-6.so");
+        -: 1119:#else
+        1: 1120:    _glfw.x11.xlib.handle = _glfw_dlopen("libX11.so.6");
+        1: 1120-block  0
+        -: 1121:#endif
+        1: 1122:    if (!_glfw.x11.xlib.handle)
+        -: 1123:    {
+    #####: 1124:        _glfwInputError(GLFW_PLATFORM_ERROR, "X11: Failed to load Xlib");
+    %%%%%: 1124-block  0
+    #####: 1125:        return GLFW_FALSE;
+        -: 1126:    }
+        -: 1127:
+        1: 1128:    _glfw.x11.xlib.AllocClassHint = (PFN_XAllocClassHint)
+        1: 1129:        _glfw_dlsym(_glfw.x11.xlib.handle, "XAllocClassHint");
+        1: 1129-block  0
+        1: 1130:    _glfw.x11.xlib.AllocSizeHints = (PFN_XAllocSizeHints)
+        1: 1131:        _glfw_dlsym(_glfw.x11.xlib.handle, "XAllocSizeHints");
+        1: 1132:    _glfw.x11.xlib.AllocWMHints = (PFN_XAllocWMHints)
+        1: 1133:        _glfw_dlsym(_glfw.x11.xlib.handle, "XAllocWMHints");
+        1: 1134:    _glfw.x11.xlib.ChangeProperty = (PFN_XChangeProperty)
+        1: 1135:        _glfw_dlsym(_glfw.x11.xlib.handle, "XChangeProperty");
+        1: 1136:    _glfw.x11.xlib.ChangeWindowAttributes = (PFN_XChangeWindowAttributes)
+        1: 1137:        _glfw_dlsym(_glfw.x11.xlib.handle, "XChangeWindowAttributes");
+        1: 1138:    _glfw.x11.xlib.CheckIfEvent = (PFN_XCheckIfEvent)
+        1: 1139:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCheckIfEvent");
+        1: 1140:    _glfw.x11.xlib.CheckTypedWindowEvent = (PFN_XCheckTypedWindowEvent)
+        1: 1141:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCheckTypedWindowEvent");
+        1: 1142:    _glfw.x11.xlib.CloseDisplay = (PFN_XCloseDisplay)
+        1: 1143:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCloseDisplay");
+        1: 1144:    _glfw.x11.xlib.CloseIM = (PFN_XCloseIM)
+        1: 1145:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCloseIM");
+        1: 1146:    _glfw.x11.xlib.ConvertSelection = (PFN_XConvertSelection)
+        1: 1147:        _glfw_dlsym(_glfw.x11.xlib.handle, "XConvertSelection");
+        1: 1148:    _glfw.x11.xlib.CreateColormap = (PFN_XCreateColormap)
+        1: 1149:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCreateColormap");
+        1: 1150:    _glfw.x11.xlib.CreateFontCursor = (PFN_XCreateFontCursor)
+        1: 1151:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCreateFontCursor");
+        1: 1152:    _glfw.x11.xlib.CreateIC = (PFN_XCreateIC)
+        1: 1153:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCreateIC");
+        1: 1154:    _glfw.x11.xlib.CreateRegion = (PFN_XCreateRegion)
+        1: 1155:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCreateRegion");
+        1: 1156:    _glfw.x11.xlib.CreateWindow = (PFN_XCreateWindow)
+        1: 1157:        _glfw_dlsym(_glfw.x11.xlib.handle, "XCreateWindow");
+        1: 1158:    _glfw.x11.xlib.DefineCursor = (PFN_XDefineCursor)
+        1: 1159:        _glfw_dlsym(_glfw.x11.xlib.handle, "XDefineCursor");
+        1: 1160:    _glfw.x11.xlib.DeleteContext = (PFN_XDeleteContext)
+        1: 1161:        _glfw_dlsym(_glfw.x11.xlib.handle, "XDeleteContext");
+        1: 1162:    _glfw.x11.xlib.DeleteProperty = (PFN_XDeleteProperty)
+        1: 1163:        _glfw_dlsym(_glfw.x11.xlib.handle, "XDeleteProperty");
+        1: 1164:    _glfw.x11.xlib.DestroyIC = (PFN_XDestroyIC)
+        1: 1165:        _glfw_dlsym(_glfw.x11.xlib.handle, "XDestroyIC");
+        1: 1166:    _glfw.x11.xlib.DestroyRegion = (PFN_XDestroyRegion)
+        1: 1167:        _glfw_dlsym(_glfw.x11.xlib.handle, "XDestroyRegion");
+        1: 1168:    _glfw.x11.xlib.DestroyWindow = (PFN_XDestroyWindow)
+        1: 1169:        _glfw_dlsym(_glfw.x11.xlib.handle, "XDestroyWindow");
+        1: 1170:    _glfw.x11.xlib.DisplayKeycodes = (PFN_XDisplayKeycodes)
+        1: 1171:        _glfw_dlsym(_glfw.x11.xlib.handle, "XDisplayKeycodes");
+        1: 1172:    _glfw.x11.xlib.EventsQueued = (PFN_XEventsQueued)
+        1: 1173:        _glfw_dlsym(_glfw.x11.xlib.handle, "XEventsQueued");
+        1: 1174:    _glfw.x11.xlib.FilterEvent = (PFN_XFilterEvent)
+        1: 1175:        _glfw_dlsym(_glfw.x11.xlib.handle, "XFilterEvent");
+        1: 1176:    _glfw.x11.xlib.FindContext = (PFN_XFindContext)
+        1: 1177:        _glfw_dlsym(_glfw.x11.xlib.handle, "XFindContext");
+        1: 1178:    _glfw.x11.xlib.Flush = (PFN_XFlush)
+        1: 1179:        _glfw_dlsym(_glfw.x11.xlib.handle, "XFlush");
+        1: 1180:    _glfw.x11.xlib.Free = (PFN_XFree)
+        1: 1181:        _glfw_dlsym(_glfw.x11.xlib.handle, "XFree");
+        1: 1182:    _glfw.x11.xlib.FreeColormap = (PFN_XFreeColormap)
+        1: 1183:        _glfw_dlsym(_glfw.x11.xlib.handle, "XFreeColormap");
+        1: 1184:    _glfw.x11.xlib.FreeCursor = (PFN_XFreeCursor)
+        1: 1185:        _glfw_dlsym(_glfw.x11.xlib.handle, "XFreeCursor");
+        1: 1186:    _glfw.x11.xlib.FreeEventData = (PFN_XFreeEventData)
+        1: 1187:        _glfw_dlsym(_glfw.x11.xlib.handle, "XFreeEventData");
+        1: 1188:    _glfw.x11.xlib.GetErrorText = (PFN_XGetErrorText)
+        1: 1189:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetErrorText");
+        1: 1190:    _glfw.x11.xlib.GetEventData = (PFN_XGetEventData)
+        1: 1191:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetEventData");
+        1: 1192:    _glfw.x11.xlib.GetICValues = (PFN_XGetICValues)
+        1: 1193:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetICValues");
+        1: 1194:    _glfw.x11.xlib.GetIMValues = (PFN_XGetIMValues)
+        1: 1195:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetIMValues");
+        1: 1196:    _glfw.x11.xlib.GetInputFocus = (PFN_XGetInputFocus)
+        1: 1197:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetInputFocus");
+        1: 1198:    _glfw.x11.xlib.GetKeyboardMapping = (PFN_XGetKeyboardMapping)
+        1: 1199:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetKeyboardMapping");
+        1: 1200:    _glfw.x11.xlib.GetScreenSaver = (PFN_XGetScreenSaver)
+        1: 1201:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetScreenSaver");
+        1: 1202:    _glfw.x11.xlib.GetSelectionOwner = (PFN_XGetSelectionOwner)
+        1: 1203:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetSelectionOwner");
+        1: 1204:    _glfw.x11.xlib.GetVisualInfo = (PFN_XGetVisualInfo)
+        1: 1205:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetVisualInfo");
+        1: 1206:    _glfw.x11.xlib.GetWMNormalHints = (PFN_XGetWMNormalHints)
+        1: 1207:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetWMNormalHints");
+        1: 1208:    _glfw.x11.xlib.GetWindowAttributes = (PFN_XGetWindowAttributes)
+        1: 1209:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetWindowAttributes");
+        1: 1210:    _glfw.x11.xlib.GetWindowProperty = (PFN_XGetWindowProperty)
+        1: 1211:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGetWindowProperty");
+        1: 1212:    _glfw.x11.xlib.GrabPointer = (PFN_XGrabPointer)
+        1: 1213:        _glfw_dlsym(_glfw.x11.xlib.handle, "XGrabPointer");
+        1: 1214:    _glfw.x11.xlib.IconifyWindow = (PFN_XIconifyWindow)
+        1: 1215:        _glfw_dlsym(_glfw.x11.xlib.handle, "XIconifyWindow");
+        1: 1216:    _glfw.x11.xlib.InitThreads = (PFN_XInitThreads)
+        1: 1217:        _glfw_dlsym(_glfw.x11.xlib.handle, "XInitThreads");
+        1: 1218:    _glfw.x11.xlib.InternAtom = (PFN_XInternAtom)
+        1: 1219:        _glfw_dlsym(_glfw.x11.xlib.handle, "XInternAtom");
+        1: 1220:    _glfw.x11.xlib.LookupString = (PFN_XLookupString)
+        1: 1221:        _glfw_dlsym(_glfw.x11.xlib.handle, "XLookupString");
+        1: 1222:    _glfw.x11.xlib.MapRaised = (PFN_XMapRaised)
+        1: 1223:        _glfw_dlsym(_glfw.x11.xlib.handle, "XMapRaised");
+        1: 1224:    _glfw.x11.xlib.MapWindow = (PFN_XMapWindow)
+        1: 1225:        _glfw_dlsym(_glfw.x11.xlib.handle, "XMapWindow");
+        1: 1226:    _glfw.x11.xlib.MoveResizeWindow = (PFN_XMoveResizeWindow)
+        1: 1227:        _glfw_dlsym(_glfw.x11.xlib.handle, "XMoveResizeWindow");
+        1: 1228:    _glfw.x11.xlib.MoveWindow = (PFN_XMoveWindow)
+        1: 1229:        _glfw_dlsym(_glfw.x11.xlib.handle, "XMoveWindow");
+        1: 1230:    _glfw.x11.xlib.NextEvent = (PFN_XNextEvent)
+        1: 1231:        _glfw_dlsym(_glfw.x11.xlib.handle, "XNextEvent");
+        1: 1232:    _glfw.x11.xlib.OpenDisplay = (PFN_XOpenDisplay)
+        1: 1233:        _glfw_dlsym(_glfw.x11.xlib.handle, "XOpenDisplay");
+        1: 1234:    _glfw.x11.xlib.OpenIM = (PFN_XOpenIM)
+        1: 1235:        _glfw_dlsym(_glfw.x11.xlib.handle, "XOpenIM");
+        1: 1236:    _glfw.x11.xlib.PeekEvent = (PFN_XPeekEvent)
+        1: 1237:        _glfw_dlsym(_glfw.x11.xlib.handle, "XPeekEvent");
+        1: 1238:    _glfw.x11.xlib.Pending = (PFN_XPending)
+        1: 1239:        _glfw_dlsym(_glfw.x11.xlib.handle, "XPending");
+        1: 1240:    _glfw.x11.xlib.QueryExtension = (PFN_XQueryExtension)
+        1: 1241:        _glfw_dlsym(_glfw.x11.xlib.handle, "XQueryExtension");
+        1: 1242:    _glfw.x11.xlib.QueryPointer = (PFN_XQueryPointer)
+        1: 1243:        _glfw_dlsym(_glfw.x11.xlib.handle, "XQueryPointer");
+        1: 1244:    _glfw.x11.xlib.RaiseWindow = (PFN_XRaiseWindow)
+        1: 1245:        _glfw_dlsym(_glfw.x11.xlib.handle, "XRaiseWindow");
+        1: 1246:    _glfw.x11.xlib.RegisterIMInstantiateCallback = (PFN_XRegisterIMInstantiateCallback)
+        1: 1247:        _glfw_dlsym(_glfw.x11.xlib.handle, "XRegisterIMInstantiateCallback");
+        1: 1248:    _glfw.x11.xlib.ResizeWindow = (PFN_XResizeWindow)
+        1: 1249:        _glfw_dlsym(_glfw.x11.xlib.handle, "XResizeWindow");
+        1: 1250:    _glfw.x11.xlib.ResourceManagerString = (PFN_XResourceManagerString)
+        1: 1251:        _glfw_dlsym(_glfw.x11.xlib.handle, "XResourceManagerString");
+        1: 1252:    _glfw.x11.xlib.SaveContext = (PFN_XSaveContext)
+        1: 1253:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSaveContext");
+        1: 1254:    _glfw.x11.xlib.SelectInput = (PFN_XSelectInput)
+        1: 1255:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSelectInput");
+        1: 1256:    _glfw.x11.xlib.SendEvent = (PFN_XSendEvent)
+        1: 1257:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSendEvent");
+        1: 1258:    _glfw.x11.xlib.SetClassHint = (PFN_XSetClassHint)
+        1: 1259:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetClassHint");
+        1: 1260:    _glfw.x11.xlib.SetErrorHandler = (PFN_XSetErrorHandler)
+        1: 1261:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetErrorHandler");
+        1: 1262:    _glfw.x11.xlib.SetICFocus = (PFN_XSetICFocus)
+        1: 1263:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetICFocus");
+        1: 1264:    _glfw.x11.xlib.SetIMValues = (PFN_XSetIMValues)
+        1: 1265:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetIMValues");
+        1: 1266:    _glfw.x11.xlib.SetInputFocus = (PFN_XSetInputFocus)
+        1: 1267:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetInputFocus");
+        1: 1268:    _glfw.x11.xlib.SetLocaleModifiers = (PFN_XSetLocaleModifiers)
+        1: 1269:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetLocaleModifiers");
+        1: 1270:    _glfw.x11.xlib.SetScreenSaver = (PFN_XSetScreenSaver)
+        1: 1271:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetScreenSaver");
+        1: 1272:    _glfw.x11.xlib.SetSelectionOwner = (PFN_XSetSelectionOwner)
+        1: 1273:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetSelectionOwner");
+        1: 1274:    _glfw.x11.xlib.SetWMHints = (PFN_XSetWMHints)
+        1: 1275:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetWMHints");
+        1: 1276:    _glfw.x11.xlib.SetWMNormalHints = (PFN_XSetWMNormalHints)
+        1: 1277:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetWMNormalHints");
+        1: 1278:    _glfw.x11.xlib.SetWMProtocols = (PFN_XSetWMProtocols)
+        1: 1279:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSetWMProtocols");
+        1: 1280:    _glfw.x11.xlib.SupportsLocale = (PFN_XSupportsLocale)
+        1: 1281:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSupportsLocale");
+        1: 1282:    _glfw.x11.xlib.Sync = (PFN_XSync)
+        1: 1283:        _glfw_dlsym(_glfw.x11.xlib.handle, "XSync");
+        1: 1284:    _glfw.x11.xlib.TranslateCoordinates = (PFN_XTranslateCoordinates)
+        1: 1285:        _glfw_dlsym(_glfw.x11.xlib.handle, "XTranslateCoordinates");
+        1: 1286:    _glfw.x11.xlib.UndefineCursor = (PFN_XUndefineCursor)
+        1: 1287:        _glfw_dlsym(_glfw.x11.xlib.handle, "XUndefineCursor");
+        1: 1288:    _glfw.x11.xlib.UngrabPointer = (PFN_XUngrabPointer)
+        1: 1289:        _glfw_dlsym(_glfw.x11.xlib.handle, "XUngrabPointer");
+        1: 1290:    _glfw.x11.xlib.UnmapWindow = (PFN_XUnmapWindow)
+        1: 1291:        _glfw_dlsym(_glfw.x11.xlib.handle, "XUnmapWindow");
+        1: 1292:    _glfw.x11.xlib.UnsetICFocus = (PFN_XUnsetICFocus)
+        1: 1293:        _glfw_dlsym(_glfw.x11.xlib.handle, "XUnsetICFocus");
+        1: 1294:    _glfw.x11.xlib.VisualIDFromVisual = (PFN_XVisualIDFromVisual)
+        1: 1295:        _glfw_dlsym(_glfw.x11.xlib.handle, "XVisualIDFromVisual");
+        1: 1296:    _glfw.x11.xlib.WarpPointer = (PFN_XWarpPointer)
+        1: 1297:        _glfw_dlsym(_glfw.x11.xlib.handle, "XWarpPointer");
+        1: 1298:    _glfw.x11.xkb.FreeKeyboard = (PFN_XkbFreeKeyboard)
+        1: 1299:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbFreeKeyboard");
+        1: 1300:    _glfw.x11.xkb.FreeNames = (PFN_XkbFreeNames)
+        1: 1301:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbFreeNames");
+        1: 1302:    _glfw.x11.xkb.GetMap = (PFN_XkbGetMap)
+        1: 1303:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbGetMap");
+        1: 1304:    _glfw.x11.xkb.GetNames = (PFN_XkbGetNames)
+        1: 1305:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbGetNames");
+        1: 1306:    _glfw.x11.xkb.GetState = (PFN_XkbGetState)
+        1: 1307:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbGetState");
+        1: 1308:    _glfw.x11.xkb.KeycodeToKeysym = (PFN_XkbKeycodeToKeysym)
+        1: 1309:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbKeycodeToKeysym");
+        1: 1310:    _glfw.x11.xkb.QueryExtension = (PFN_XkbQueryExtension)
+        1: 1311:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbQueryExtension");
+        1: 1312:    _glfw.x11.xkb.SelectEventDetails = (PFN_XkbSelectEventDetails)
+        1: 1313:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbSelectEventDetails");
+        1: 1314:    _glfw.x11.xkb.SetDetectableAutoRepeat = (PFN_XkbSetDetectableAutoRepeat)
+        1: 1315:        _glfw_dlsym(_glfw.x11.xlib.handle, "XkbSetDetectableAutoRepeat");
+        1: 1316:    _glfw.x11.xrm.DestroyDatabase = (PFN_XrmDestroyDatabase)
+        1: 1317:        _glfw_dlsym(_glfw.x11.xlib.handle, "XrmDestroyDatabase");
+        1: 1318:    _glfw.x11.xrm.GetResource = (PFN_XrmGetResource)
+        1: 1319:        _glfw_dlsym(_glfw.x11.xlib.handle, "XrmGetResource");
+        1: 1320:    _glfw.x11.xrm.GetStringDatabase = (PFN_XrmGetStringDatabase)
+        1: 1321:        _glfw_dlsym(_glfw.x11.xlib.handle, "XrmGetStringDatabase");
+        1: 1322:    _glfw.x11.xrm.Initialize = (PFN_XrmInitialize)
+        1: 1323:        _glfw_dlsym(_glfw.x11.xlib.handle, "XrmInitialize");
+        1: 1324:    _glfw.x11.xrm.UniqueQuark = (PFN_XrmUniqueQuark)
+        1: 1325:        _glfw_dlsym(_glfw.x11.xlib.handle, "XrmUniqueQuark");
+        1: 1326:    _glfw.x11.xlib.UnregisterIMInstantiateCallback = (PFN_XUnregisterIMInstantiateCallback)
+        1: 1327:        _glfw_dlsym(_glfw.x11.xlib.handle, "XUnregisterIMInstantiateCallback");
+        1: 1328:    _glfw.x11.xlib.utf8LookupString = (PFN_Xutf8LookupString)
+        1: 1329:        _glfw_dlsym(_glfw.x11.xlib.handle, "Xutf8LookupString");
+        1: 1330:    _glfw.x11.xlib.utf8SetWMProperties = (PFN_Xutf8SetWMProperties)
+        1: 1331:        _glfw_dlsym(_glfw.x11.xlib.handle, "Xutf8SetWMProperties");
+        -: 1332:
+        1: 1333:    if (_glfw.x11.xlib.utf8LookupString && _glfw.x11.xlib.utf8SetWMProperties)
+        1: 1333-block  0
+        1: 1334:        _glfw.x11.xlib.utf8 = GLFW_TRUE;
+        1: 1334-block  0
+        -: 1335:
+        1: 1336:    XInitThreads();
+        1: 1336-block  0
+        1: 1337:    XrmInitialize();
+        -: 1338:
+        1: 1339:    _glfw.x11.display = XOpenDisplay(NULL);
+        1: 1340:    if (!_glfw.x11.display)
+        -: 1341:    {
+    #####: 1342:        const char* display = getenv("DISPLAY");
+    %%%%%: 1342-block  0
+    #####: 1343:        if (display)
+        -: 1344:        {
+    #####: 1345:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%: 1345-block  0
+        -: 1346:                            "X11: Failed to open display %s", display);
+        -: 1347:        }
+        -: 1348:        else
+        -: 1349:        {
+    #####: 1350:            _glfwInputError(GLFW_PLATFORM_ERROR,
+    %%%%%: 1350-block  0
+        -: 1351:                            "X11: The DISPLAY environment variable is missing");
+        -: 1352:        }
+        -: 1353:
+    #####: 1354:        return GLFW_FALSE;
+    %%%%%: 1354-block  0
+        -: 1355:    }
+        -: 1356:
+        1: 1357:    _glfw.x11.screen = DefaultScreen(_glfw.x11.display);
+        1: 1358:    _glfw.x11.root = RootWindow(_glfw.x11.display, _glfw.x11.screen);
+        1: 1359:    _glfw.x11.context = XUniqueContext();
+        1: 1359-block  0
+        -: 1360:
+        1: 1361:    getSystemContentScale(&_glfw.x11.contentScaleX, &_glfw.x11.contentScaleY);
+        -: 1362:
+        1: 1363:    if (!initExtensions())
+    #####: 1364:        return GLFW_FALSE;
+    %%%%%: 1364-block  0
+        -: 1365:
+        1: 1366:    _glfw.x11.helperWindowHandle = createHelperWindow();
+        1: 1366-block  0
+        1: 1367:    _glfw.x11.hiddenCursorHandle = createHiddenCursor();
+        -: 1368:
+        1: 1369:    if (XSupportsLocale() && _glfw.x11.xlib.utf8)
+        1: 1369-block  0
+        -: 1370:    {
+        1: 1371:        XSetLocaleModifiers("");
+        1: 1371-block  0
+        -: 1372:
+        -: 1373:        // If an IM is already present our callback will be called right away
+        1: 1374:        XRegisterIMInstantiateCallback(_glfw.x11.display,
+        -: 1375:                                       NULL, NULL, NULL,
+        -: 1376:                                       inputMethodInstantiateCallback,
+        -: 1377:                                       NULL);
+        -: 1378:    }
+        -: 1379:
+        1: 1380:    _glfwInitTimerPOSIX();
+        1: 1380-block  0
+        -: 1381:
+        1: 1382:    _glfwPollMonitorsX11();
+        1: 1383:    return GLFW_TRUE;
+        -: 1384:}
+        -: 1385:
+    #####: 1386:void _glfwPlatformTerminate(void)
+        -: 1387:{
+    #####: 1388:    if (_glfw.x11.helperWindowHandle)
+    %%%%%: 1388-block  0
+        -: 1389:    {
+    #####: 1390:        if (XGetSelectionOwner(_glfw.x11.display, _glfw.x11.CLIPBOARD) ==
+    %%%%%: 1390-block  0
+    #####: 1391:            _glfw.x11.helperWindowHandle)
+        -: 1392:        {
+    #####: 1393:            _glfwPushSelectionToManagerX11();
+    %%%%%: 1393-block  0
+        -: 1394:        }
+        -: 1395:
+    #####: 1396:        XDestroyWindow(_glfw.x11.display, _glfw.x11.helperWindowHandle);
+    %%%%%: 1396-block  0
+    #####: 1397:        _glfw.x11.helperWindowHandle = None;
+        -: 1398:    }
+        -: 1399:
+    #####: 1400:    if (_glfw.x11.hiddenCursorHandle)
+    %%%%%: 1400-block  0
+        -: 1401:    {
+    #####: 1402:        XFreeCursor(_glfw.x11.display, _glfw.x11.hiddenCursorHandle);
+    %%%%%: 1402-block  0
+    #####: 1403:        _glfw.x11.hiddenCursorHandle = (Cursor) 0;
+        -: 1404:    }
+        -: 1405:
+    #####: 1406:    free(_glfw.x11.primarySelectionString);
+    #####: 1407:    free(_glfw.x11.clipboardString);
+        -: 1408:
+    #####: 1409:    XUnregisterIMInstantiateCallback(_glfw.x11.display,
+    %%%%%: 1409-block  0
+        -: 1410:                                     NULL, NULL, NULL,
+        -: 1411:                                     inputMethodInstantiateCallback,
+        -: 1412:                                     NULL);
+        -: 1413:
+    #####: 1414:    if (_glfw.x11.im)
+        -: 1415:    {
+    #####: 1416:        XCloseIM(_glfw.x11.im);
+    %%%%%: 1416-block  0
+    #####: 1417:        _glfw.x11.im = NULL;
+        -: 1418:    }
+        -: 1419:
+    #####: 1420:    if (_glfw.x11.display)
+    %%%%%: 1420-block  0
+        -: 1421:    {
+    #####: 1422:        XCloseDisplay(_glfw.x11.display);
+    %%%%%: 1422-block  0
+    #####: 1423:        _glfw.x11.display = NULL;
+        -: 1424:    }
+        -: 1425:
+    #####: 1426:    if (_glfw.x11.x11xcb.handle)
+    %%%%%: 1426-block  0
+        -: 1427:    {
+    #####: 1428:        _glfw_dlclose(_glfw.x11.x11xcb.handle);
+    %%%%%: 1428-block  0
+    #####: 1429:        _glfw.x11.x11xcb.handle = NULL;
+        -: 1430:    }
+        -: 1431:
+    #####: 1432:    if (_glfw.x11.xcursor.handle)
+    %%%%%: 1432-block  0
+        -: 1433:    {
+    #####: 1434:        _glfw_dlclose(_glfw.x11.xcursor.handle);
+    %%%%%: 1434-block  0
+    #####: 1435:        _glfw.x11.xcursor.handle = NULL;
+        -: 1436:    }
+        -: 1437:
+    #####: 1438:    if (_glfw.x11.randr.handle)
+    %%%%%: 1438-block  0
+        -: 1439:    {
+    #####: 1440:        _glfw_dlclose(_glfw.x11.randr.handle);
+    %%%%%: 1440-block  0
+    #####: 1441:        _glfw.x11.randr.handle = NULL;
+        -: 1442:    }
+        -: 1443:
+    #####: 1444:    if (_glfw.x11.xinerama.handle)
+    %%%%%: 1444-block  0
+        -: 1445:    {
+    #####: 1446:        _glfw_dlclose(_glfw.x11.xinerama.handle);
+    %%%%%: 1446-block  0
+    #####: 1447:        _glfw.x11.xinerama.handle = NULL;
+        -: 1448:    }
+        -: 1449:
+    #####: 1450:    if (_glfw.x11.xrender.handle)
+    %%%%%: 1450-block  0
+        -: 1451:    {
+    #####: 1452:        _glfw_dlclose(_glfw.x11.xrender.handle);
+    %%%%%: 1452-block  0
+    #####: 1453:        _glfw.x11.xrender.handle = NULL;
+        -: 1454:    }
+        -: 1455:
+    #####: 1456:    if (_glfw.x11.vidmode.handle)
+    %%%%%: 1456-block  0
+        -: 1457:    {
+    #####: 1458:        _glfw_dlclose(_glfw.x11.vidmode.handle);
+    %%%%%: 1458-block  0
+    #####: 1459:        _glfw.x11.vidmode.handle = NULL;
+        -: 1460:    }
+        -: 1461:
+    #####: 1462:    if (_glfw.x11.xi.handle)
+    %%%%%: 1462-block  0
+        -: 1463:    {
+    #####: 1464:        _glfw_dlclose(_glfw.x11.xi.handle);
+    %%%%%: 1464-block  0
+    #####: 1465:        _glfw.x11.xi.handle = NULL;
+        -: 1466:    }
+        -: 1467:
+        -: 1468:    // NOTE: These need to be unloaded after XCloseDisplay, as they register
+        -: 1469:    //       cleanup callbacks that get called by that function
+    #####: 1470:    _glfwTerminateEGL();
+    %%%%%: 1470-block  0
+    #####: 1471:    _glfwTerminateGLX();
+        -: 1472:
+    #####: 1473:    if (_glfw.x11.xlib.handle)
+        -: 1474:    {
+    #####: 1475:        _glfw_dlclose(_glfw.x11.xlib.handle);
+    %%%%%: 1475-block  0
+    #####: 1476:        _glfw.x11.xlib.handle = NULL;
+        -: 1477:    }
+    #####: 1478:}
+        -: 1479:
+    #####: 1480:const char* _glfwPlatformGetVersionString(void)
+        -: 1481:{
+    #####: 1482:    return _GLFW_VERSION_NUMBER " X11 GLX EGL OSMesa"
+    %%%%%: 1482-block  0
+        -: 1483:#if defined(_POSIX_TIMERS) && defined(_POSIX_MONOTONIC_CLOCK)
+        -: 1484:        " clock_gettime"
+        -: 1485:#else
+        -: 1486:        " gettimeofday"
+        -: 1487:#endif
+        -: 1488:#if defined(__linux__)
+        -: 1489:        " evdev"
+        -: 1490:#endif
+        -: 1491:#if defined(_GLFW_BUILD_DLL)
+        -: 1492:        " shared"
+        -: 1493:#endif
+        -: 1494:        ;
+        -: 1495:}
+        -: 1496:

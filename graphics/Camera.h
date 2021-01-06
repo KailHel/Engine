@@ -1,33 +1,32 @@
-//
-// Created by kail on 30.12.2020.
-//
+/*
+ * Camera.h
+ *
+ *  Created on: Feb 11, 2020
+ *      Author: MihailRis
+ */
 
-#ifndef OPENGL_CAMERA_H
-#define OPENGL_CAMERA_H
+#ifndef WINDOW_CAMERA_H_
+#define WINDOW_CAMERA_H_
 
-#include <glad/glad.h>
-#include "glm/matrix.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
+#include <glm/glm.hpp>
 using namespace glm;
 
-namespace SK {
-    namespace Render {
-        class Camera {
-        public:
-            //--------------------------------------------------------------------------------------------------------------------------------------------------------
-            Camera(const GLfloat x = 0, const GLfloat y = 0, const GLfloat w = 800, const GLfloat h = 600, const GLfloat zNear = -100.f, const GLfloat zFar = 100.f);
-            ~Camera() = default;
+class Camera {
+	void updateVectors();
+public:
+	vec3 front;
+	vec3 up;
+	vec3 right;
 
-            //--------------------------------------------------------------------------------------------------------------------------------------------------------
-            const mat4 getMatrix4() const;
-            void Move(const vec3& vecMove);
-            void Rotate(const GLfloat grad);
-        private:
-            //--------------------------------------------------------------------------------------------------------------------------------------------------------
+	vec3 position;
+	float fov;
+	mat4 rotation;
+	Camera(vec3 position, float fov);
 
-            glm::mat4 _Matrix4 =  mat4(1.f);
-        };
-    }
-}
-#endif //OPENGL_CAMERA_H
+	void rotate(float x, float y, float z);
+
+	mat4 getProjection();
+	mat4 getView();
+};
+
+#endif /* WINDOW_CAMERA_H_ */

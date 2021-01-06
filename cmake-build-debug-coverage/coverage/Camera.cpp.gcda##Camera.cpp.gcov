@@ -1,0 +1,29 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/graphics/Camera.cpp
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/graphics/Camera.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/graphics/Camera.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#include "Camera.h"
+        -:    2:
+        1:    3:SK::Render::Camera::Camera(const GLfloat x, const GLfloat y, const GLfloat w, const GLfloat h, const GLfloat zNear, const GLfloat zFar)
+        1:    3-block  0
+        -:    4:{
+        1:    5:	_Matrix4 = ortho(x, w, y, h, zNear, zFar);
+        1:    6:}
+        -:    7:
+        1:    8:const mat4 SK::Render::Camera::getMatrix4() const
+        -:    9:{
+        1:   10:	return _Matrix4;
+        1:   10-block  0
+        -:   11:}
+        -:   12:
+    #####:   13:void SK::Render::Camera::Move(const vec3& vecMove)
+        -:   14:{
+    #####:   15:	_Matrix4 = translate(_Matrix4, vecMove);
+    %%%%%:   15-block  0
+    #####:   16:}
+    #####:   17:void SK::Render::Camera::Rotate(const GLfloat grad)
+        -:   18:{
+    #####:   19:	_Matrix4 = rotate(_Matrix4, radians(grad), vec3(0.f, 0.f, 1.f));
+    %%%%%:   19-block  0
+    #####:   20:}
+    %%%%%:   20-block  0

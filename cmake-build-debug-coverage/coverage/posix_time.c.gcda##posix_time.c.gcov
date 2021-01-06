@@ -1,0 +1,101 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/external_libraries/glfw/src/posix_time.c
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/posix_time.c.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/posix_time.c.gcda
+        -:    0:Runs:1
+        -:    1://========================================================================
+        -:    2:// GLFW 3.4 POSIX - www.glfw.org
+        -:    3://------------------------------------------------------------------------
+        -:    4:// Copyright (c) 2002-2006 Marcus Geelnard
+        -:    5:// Copyright (c) 2006-2017 Camilla Löwy <elmindreda@glfw.org>
+        -:    6://
+        -:    7:// This software is provided 'as-is', without any express or implied
+        -:    8:// warranty. In no event will the authors be held liable for any damages
+        -:    9:// arising from the use of this software.
+        -:   10://
+        -:   11:// Permission is granted to anyone to use this software for any purpose,
+        -:   12:// including commercial applications, and to alter it and redistribute it
+        -:   13:// freely, subject to the following restrictions:
+        -:   14://
+        -:   15:// 1. The origin of this software must not be misrepresented; you must not
+        -:   16://    claim that you wrote the original software. If you use this software
+        -:   17://    in a product, an acknowledgment in the product documentation would
+        -:   18://    be appreciated but is not required.
+        -:   19://
+        -:   20:// 2. Altered source versions must be plainly marked as such, and must not
+        -:   21://    be misrepresented as being the original software.
+        -:   22://
+        -:   23:// 3. This notice may not be removed or altered from any source
+        -:   24://    distribution.
+        -:   25://
+        -:   26://========================================================================
+        -:   27:// It is fine to use C99 in this file because it will not be built with VS
+        -:   28://========================================================================
+        -:   29:
+        -:   30:#define _POSIX_C_SOURCE 199309L
+        -:   31:
+        -:   32:#include "internal.h"
+        -:   33:
+        -:   34:#include <unistd.h>
+        -:   35:#include <sys/time.h>
+        -:   36:#include <time.h>
+        -:   37:
+        -:   38:
+        -:   39://////////////////////////////////////////////////////////////////////////
+        -:   40://////                       GLFW internal API                      //////
+        -:   41://////////////////////////////////////////////////////////////////////////
+        -:   42:
+        -:   43:// Initialise timer
+        -:   44://
+        1:   45:void _glfwInitTimerPOSIX(void)
+        -:   46:{
+        -:   47:#if defined(_POSIX_TIMERS) && defined(_POSIX_MONOTONIC_CLOCK)
+        -:   48:    struct timespec ts;
+        -:   49:
+        1:   50:    if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
+        1:   50-block  0
+        -:   51:    {
+        1:   52:        _glfw.timer.posix.monotonic = GLFW_TRUE;
+        1:   53:        _glfw.timer.posix.frequency = 1000000000;
+        1:   53-block  0
+        -:   54:    }
+        -:   55:    else
+        -:   56:#endif
+        -:   57:    {
+    #####:   58:        _glfw.timer.posix.monotonic = GLFW_FALSE;
+    #####:   59:        _glfw.timer.posix.frequency = 1000000;
+    %%%%%:   59-block  0
+        -:   60:    }
+        1:   61:}
+        -:   62:
+        -:   63:
+        -:   64://////////////////////////////////////////////////////////////////////////
+        -:   65://////                       GLFW platform API                      //////
+        -:   66://////////////////////////////////////////////////////////////////////////
+        -:   67:
+       21:   68:uint64_t _glfwPlatformGetTimerValue(void)
+        -:   69:{
+        -:   70:#if defined(_POSIX_TIMERS) && defined(_POSIX_MONOTONIC_CLOCK)
+       21:   71:    if (_glfw.timer.posix.monotonic)
+       21:   71-block  0
+        -:   72:    {
+        -:   73:        struct timespec ts;
+       21:   74:        clock_gettime(CLOCK_MONOTONIC, &ts);
+       21:   74-block  0
+       21:   75:        return (uint64_t) ts.tv_sec * (uint64_t) 1000000000 + (uint64_t) ts.tv_nsec;
+        -:   76:    }
+        -:   77:    else
+        -:   78:#endif
+        -:   79:    {
+        -:   80:        struct timeval tv;
+    #####:   81:        gettimeofday(&tv, NULL);
+    %%%%%:   81-block  0
+    #####:   82:        return (uint64_t) tv.tv_sec * (uint64_t) 1000000 + (uint64_t) tv.tv_usec;
+        -:   83:    }
+        -:   84:}
+        -:   85:
+       10:   86:uint64_t _glfwPlatformGetTimerFrequency(void)
+        -:   87:{
+       10:   88:    return _glfw.timer.posix.frequency;
+       10:   88-block  0
+        -:   89:}
+        -:   90:

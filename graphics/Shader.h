@@ -111,6 +111,10 @@ namespace SK {
             bool _isCompile = false;
         public:
             ~Shader() { glDeleteProgram(ID); }
+            Shader() = delete;
+            Shader(const ResourcesManager&) = delete;
+            Shader& operator=(const Shader&) = delete;
+            Shader& operator=(Shader&&) = delete;
         };
     }
 }

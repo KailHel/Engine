@@ -1,0 +1,551 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/external_libraries/glfw/src/linux_joystick.c
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/linux_joystick.c.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/external_libraries/glfw/src/CMakeFiles/glfw.dir/linux_joystick.c.gcda
+        -:    0:Runs:1
+        -:    1://========================================================================
+        -:    2:// GLFW 3.4 Linux - www.glfw.org
+        -:    3://------------------------------------------------------------------------
+        -:    4:// Copyright (c) 2002-2006 Marcus Geelnard
+        -:    5:// Copyright (c) 2006-2017 Camilla Löwy <elmindreda@glfw.org>
+        -:    6://
+        -:    7:// This software is provided 'as-is', without any express or implied
+        -:    8:// warranty. In no event will the authors be held liable for any damages
+        -:    9:// arising from the use of this software.
+        -:   10://
+        -:   11:// Permission is granted to anyone to use this software for any purpose,
+        -:   12:// including commercial applications, and to alter it and redistribute it
+        -:   13:// freely, subject to the following restrictions:
+        -:   14://
+        -:   15:// 1. The origin of this software must not be misrepresented; you must not
+        -:   16://    claim that you wrote the original software. If you use this software
+        -:   17://    in a product, an acknowledgment in the product documentation would
+        -:   18://    be appreciated but is not required.
+        -:   19://
+        -:   20:// 2. Altered source versions must be plainly marked as such, and must not
+        -:   21://    be misrepresented as being the original software.
+        -:   22://
+        -:   23:// 3. This notice may not be removed or altered from any source
+        -:   24://    distribution.
+        -:   25://
+        -:   26://========================================================================
+        -:   27:// It is fine to use C99 in this file because it will not be built with VS
+        -:   28://========================================================================
+        -:   29:
+        -:   30:#include "internal.h"
+        -:   31:
+        -:   32:#include <sys/types.h>
+        -:   33:#include <sys/stat.h>
+        -:   34:#include <sys/inotify.h>
+        -:   35:#include <fcntl.h>
+        -:   36:#include <errno.h>
+        -:   37:#include <dirent.h>
+        -:   38:#include <stdio.h>
+        -:   39:#include <stdlib.h>
+        -:   40:#include <string.h>
+        -:   41:#include <unistd.h>
+        -:   42:
+        -:   43:#ifndef SYN_DROPPED // < v2.6.39 kernel headers
+        -:   44:// Workaround for CentOS-6, which is supported till 2020-11-30, but still on v2.6.32
+        -:   45:#define SYN_DROPPED 3
+        -:   46:#endif
+        -:   47:
+        -:   48:// Apply an EV_KEY event to the specified joystick
+        -:   49://
+    #####:   50:static void handleKeyEvent(_GLFWjoystick* js, int code, int value)
+        -:   51:{
+    #####:   52:    _glfwInputJoystickButton(js,
+    #####:   53:                             js->linjs.keyMap[code - BTN_MISC],
+    %%%%%:   53-block  0
+        -:   54:                             value ? GLFW_PRESS : GLFW_RELEASE);
+    #####:   55:}
+        -:   56:
+        -:   57:// Apply an EV_ABS event to the specified joystick
+        -:   58://
+    #####:   59:static void handleAbsEvent(_GLFWjoystick* js, int code, int value)
+        -:   60:{
+    #####:   61:    const int index = js->linjs.absMap[code];
+        -:   62:
+    #####:   63:    if (code >= ABS_HAT0X && code <= ABS_HAT3Y)
+    %%%%%:   63-block  0
+    %%%%%:   63-block  1
+    #####:   64:    {
+        -:   65:        static const char stateMap[3][3] =
+        -:   66:        {
+        -:   67:            { GLFW_HAT_CENTERED, GLFW_HAT_UP,       GLFW_HAT_DOWN },
+        -:   68:            { GLFW_HAT_LEFT,     GLFW_HAT_LEFT_UP,  GLFW_HAT_LEFT_DOWN },
+        -:   69:            { GLFW_HAT_RIGHT,    GLFW_HAT_RIGHT_UP, GLFW_HAT_RIGHT_DOWN },
+        -:   70:        };
+        -:   71:
+    #####:   72:        const int hat = (code - ABS_HAT0X) / 2;
+    #####:   73:        const int axis = (code - ABS_HAT0X) % 2;
+    #####:   74:        int* state = js->linjs.hats[hat];
+        -:   75:
+        -:   76:        // NOTE: Looking at several input drivers, it seems all hat events use
+        -:   77:        //       -1 for left / up, 0 for centered and 1 for right / down
+    #####:   78:        if (value == 0)
+    %%%%%:   78-block  0
+    #####:   79:            state[axis] = 0;
+    %%%%%:   79-block  0
+    #####:   80:        else if (value < 0)
+    %%%%%:   80-block  0
+    #####:   81:            state[axis] = 1;
+    %%%%%:   81-block  0
+    #####:   82:        else if (value > 0)
+    %%%%%:   82-block  0
+    #####:   83:            state[axis] = 2;
+    %%%%%:   83-block  0
+        -:   84:
+    #####:   85:        _glfwInputJoystickHat(js, index, stateMap[state[0]][state[1]]);
+    %%%%%:   85-block  0
+        -:   86:    }
+        -:   87:    else
+        -:   88:    {
+    #####:   89:        const struct input_absinfo* info = &js->linjs.absInfo[code];
+    #####:   90:        float normalized = value;
+        -:   91:
+    #####:   92:        const int range = info->maximum - info->minimum;
+    #####:   93:        if (range)
+    %%%%%:   93-block  0
+        -:   94:        {
+        -:   95:            // Normalize to 0.0 -> 1.0
+    #####:   96:            normalized = (normalized - info->minimum) / range;
+        -:   97:            // Normalize to -1.0 -> 1.0
+    #####:   98:            normalized = normalized * 2.0f - 1.0f;
+    %%%%%:   98-block  0
+        -:   99:        }
+        -:  100:
+    #####:  101:        _glfwInputJoystickAxis(js, index, normalized);
+    %%%%%:  101-block  0
+        -:  102:    }
+    #####:  103:}
+        -:  104:
+        -:  105:// Poll state of absolute axes
+        -:  106://
+    #####:  107:static void pollAbsState(_GLFWjoystick* js)
+        -:  108:{
+    #####:  109:    for (int code = 0;  code < ABS_CNT;  code++)
+    %%%%%:  109-block  0
+    %%%%%:  109-block  1
+    %%%%%:  109-block  2
+        -:  110:    {
+    #####:  111:        if (js->linjs.absMap[code] < 0)
+    %%%%%:  111-block  0
+    #####:  112:            continue;
+    %%%%%:  112-block  0
+        -:  113:
+    #####:  114:        struct input_absinfo* info = &js->linjs.absInfo[code];
+        -:  115:
+    #####:  116:        if (ioctl(js->linjs.fd, EVIOCGABS(code), info) < 0)
+    %%%%%:  116-block  0
+    #####:  117:            continue;
+    %%%%%:  117-block  0
+        -:  118:
+    #####:  119:        handleAbsEvent(js, code, info->value);
+    %%%%%:  119-block  0
+        -:  120:    }
+    #####:  121:}
+        -:  122:
+        -:  123:#define isBitSet(bit, arr) (arr[(bit) / 8] & (1 << ((bit) % 8)))
+        -:  124:
+        -:  125:// Attempt to open the specified joystick device
+        -:  126://
+    #####:  127:static GLFWbool openJoystickDevice(const char* path)
+        -:  128:{
+    #####:  129:    for (int jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
+    %%%%%:  129-block  0
+    %%%%%:  129-block  1
+    %%%%%:  129-block  2
+        -:  130:    {
+    #####:  131:        if (!_glfw.joysticks[jid].present)
+    %%%%%:  131-block  0
+    #####:  132:            continue;
+    %%%%%:  132-block  0
+    #####:  133:        if (strcmp(_glfw.joysticks[jid].linjs.path, path) == 0)
+    %%%%%:  133-block  0
+    #####:  134:            return GLFW_FALSE;
+    %%%%%:  134-block  0
+        -:  135:    }
+        -:  136:
+    #####:  137:    _GLFWjoystickLinux linjs = {0};
+    #####:  138:    linjs.fd = open(path, O_RDONLY | O_NONBLOCK);
+    %%%%%:  138-block  0
+    #####:  139:    if (linjs.fd == -1)
+    #####:  140:        return GLFW_FALSE;
+    %%%%%:  140-block  0
+        -:  141:
+    #####:  142:    char evBits[(EV_CNT + 7) / 8] = {0};
+    #####:  143:    char keyBits[(KEY_CNT + 7) / 8] = {0};
+    #####:  144:    char absBits[(ABS_CNT + 7) / 8] = {0};
+        -:  145:    struct input_id id;
+        -:  146:
+    #####:  147:    if (ioctl(linjs.fd, EVIOCGBIT(0, sizeof(evBits)), evBits) < 0 ||
+    %%%%%:  147-block  0
+    #####:  148:        ioctl(linjs.fd, EVIOCGBIT(EV_KEY, sizeof(keyBits)), keyBits) < 0 ||
+    %%%%%:  148-block  0
+    #####:  149:        ioctl(linjs.fd, EVIOCGBIT(EV_ABS, sizeof(absBits)), absBits) < 0 ||
+    %%%%%:  149-block  0
+    #####:  150:        ioctl(linjs.fd, EVIOCGID, &id) < 0)
+    %%%%%:  150-block  0
+        -:  151:    {
+    #####:  152:        _glfwInputError(GLFW_PLATFORM_ERROR,
+        -:  153:                        "Linux: Failed to query input device: %s",
+    #####:  154:                        strerror(errno));
+    %%%%%:  154-block  0
+    #####:  155:        close(linjs.fd);
+    #####:  156:        return GLFW_FALSE;
+        -:  157:    }
+        -:  158:
+        -:  159:    // Ensure this device supports the events expected of a joystick
+    #####:  160:    if (!isBitSet(EV_KEY, evBits) || !isBitSet(EV_ABS, evBits))
+    %%%%%:  160-block  0
+    %%%%%:  160-block  1
+        -:  161:    {
+    #####:  162:        close(linjs.fd);
+    %%%%%:  162-block  0
+    #####:  163:        return GLFW_FALSE;
+        -:  164:    }
+        -:  165:
+    #####:  166:    char name[256] = "";
+        -:  167:
+    #####:  168:    if (ioctl(linjs.fd, EVIOCGNAME(sizeof(name)), name) < 0)
+    %%%%%:  168-block  0
+    #####:  169:        strncpy(name, "Unknown", sizeof(name));
+    %%%%%:  169-block  0
+        -:  170:
+    #####:  171:    char guid[33] = "";
+        -:  172:
+        -:  173:    // Generate a joystick GUID that matches the SDL 2.0.5+ one
+    #####:  174:    if (id.vendor && id.product && id.version)
+    %%%%%:  174-block  0
+    %%%%%:  174-block  1
+    %%%%%:  174-block  2
+        -:  175:    {
+    #####:  176:        sprintf(guid, "%02x%02x0000%02x%02x0000%02x%02x0000%02x%02x0000",
+    #####:  177:                id.bustype & 0xff, id.bustype >> 8,
+    #####:  178:                id.vendor & 0xff,  id.vendor >> 8,
+    #####:  179:                id.product & 0xff, id.product >> 8,
+    #####:  180:                id.version & 0xff, id.version >> 8);
+    %%%%%:  180-block  0
+        -:  181:    }
+        -:  182:    else
+        -:  183:    {
+    #####:  184:        sprintf(guid, "%02x%02x0000%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x00",
+    #####:  185:                id.bustype & 0xff, id.bustype >> 8,
+    #####:  186:                name[0], name[1], name[2], name[3],
+    #####:  187:                name[4], name[5], name[6], name[7],
+    #####:  188:                name[8], name[9], name[10]);
+    %%%%%:  188-block  0
+        -:  189:    }
+        -:  190:
+    #####:  191:    int axisCount = 0, buttonCount = 0, hatCount = 0;
+        -:  192:
+    #####:  193:    for (int code = BTN_MISC;  code < KEY_CNT;  code++)
+    %%%%%:  193-block  0
+    %%%%%:  193-block  1
+    %%%%%:  193-block  2
+        -:  194:    {
+    #####:  195:        if (!isBitSet(code, keyBits))
+    %%%%%:  195-block  0
+    #####:  196:            continue;
+    %%%%%:  196-block  0
+        -:  197:
+    #####:  198:        linjs.keyMap[code - BTN_MISC] = buttonCount;
+    #####:  199:        buttonCount++;
+    %%%%%:  199-block  0
+        -:  200:    }
+        -:  201:
+    #####:  202:    for (int code = 0;  code < ABS_CNT;  code++)
+    %%%%%:  202-block  0
+    %%%%%:  202-block  1
+    %%%%%:  202-block  2
+        -:  203:    {
+    #####:  204:        linjs.absMap[code] = -1;
+    #####:  205:        if (!isBitSet(code, absBits))
+    %%%%%:  205-block  0
+    #####:  206:            continue;
+    %%%%%:  206-block  0
+        -:  207:
+    #####:  208:        if (code >= ABS_HAT0X && code <= ABS_HAT3Y)
+    %%%%%:  208-block  0
+    %%%%%:  208-block  1
+        -:  209:        {
+    #####:  210:            linjs.absMap[code] = hatCount;
+    #####:  211:            hatCount++;
+        -:  212:            // Skip the Y axis
+    #####:  213:            code++;
+    %%%%%:  213-block  0
+        -:  214:        }
+        -:  215:        else
+        -:  216:        {
+    #####:  217:            if (ioctl(linjs.fd, EVIOCGABS(code), &linjs.absInfo[code]) < 0)
+    %%%%%:  217-block  0
+    #####:  218:                continue;
+    %%%%%:  218-block  0
+        -:  219:
+    #####:  220:            linjs.absMap[code] = axisCount;
+    #####:  221:            axisCount++;
+    %%%%%:  221-block  0
+        -:  222:        }
+        -:  223:    }
+        -:  224:
+        -:  225:    _GLFWjoystick* js =
+    #####:  226:        _glfwAllocJoystick(name, guid, axisCount, buttonCount, hatCount);
+    %%%%%:  226-block  0
+    #####:  227:    if (!js)
+        -:  228:    {
+    #####:  229:        close(linjs.fd);
+    %%%%%:  229-block  0
+    #####:  230:        return GLFW_FALSE;
+        -:  231:    }
+        -:  232:
+    #####:  233:    strncpy(linjs.path, path, sizeof(linjs.path) - 1);
+    #####:  234:    memcpy(&js->linjs, &linjs, sizeof(linjs));
+        -:  235:
+    #####:  236:    pollAbsState(js);
+    %%%%%:  236-block  0
+        -:  237:
+    #####:  238:    _glfwInputJoystick(js, GLFW_CONNECTED);
+    #####:  239:    return GLFW_TRUE;
+        -:  240:}
+        -:  241:
+        -:  242:#undef isBitSet
+        -:  243:
+        -:  244:// Frees all resources associated with the specified joystick
+        -:  245://
+    #####:  246:static void closeJoystick(_GLFWjoystick* js)
+        -:  247:{
+    #####:  248:    close(js->linjs.fd);
+    %%%%%:  248-block  0
+    #####:  249:    _glfwFreeJoystick(js);
+    #####:  250:    _glfwInputJoystick(js, GLFW_DISCONNECTED);
+    #####:  251:}
+        -:  252:
+        -:  253:// Lexically compare joysticks by name; used by qsort
+        -:  254://
+    #####:  255:static int compareJoysticks(const void* fp, const void* sp)
+        -:  256:{
+    #####:  257:    const _GLFWjoystick* fj = fp;
+    #####:  258:    const _GLFWjoystick* sj = sp;
+    #####:  259:    return strcmp(fj->linjs.path, sj->linjs.path);
+    %%%%%:  259-block  0
+        -:  260:}
+        -:  261:
+        -:  262:
+        -:  263://////////////////////////////////////////////////////////////////////////
+        -:  264://////                       GLFW internal API                      //////
+        -:  265://////////////////////////////////////////////////////////////////////////
+        -:  266:
+    #####:  267:void _glfwDetectJoystickConnectionLinux(void)
+        -:  268:{
+    #####:  269:    if (_glfw.linjs.inotify <= 0)
+    %%%%%:  269-block  0
+    #####:  270:        return;
+    %%%%%:  270-block  0
+        -:  271:
+    #####:  272:    ssize_t offset = 0;
+        -:  273:    char buffer[16384];
+    #####:  274:    const ssize_t size = read(_glfw.linjs.inotify, buffer, sizeof(buffer));
+    %%%%%:  274-block  0
+        -:  275:
+    #####:  276:    while (size > offset)
+    %%%%%:  276-block  0
+        -:  277:    {
+        -:  278:        regmatch_t match;
+    #####:  279:        const struct inotify_event* e = (struct inotify_event*) (buffer + offset);
+        -:  280:
+    #####:  281:        offset += sizeof(struct inotify_event) + e->len;
+        -:  282:
+    #####:  283:        if (regexec(&_glfw.linjs.regex, e->name, 1, &match, 0) != 0)
+    %%%%%:  283-block  0
+    #####:  284:            continue;
+    %%%%%:  284-block  0
+        -:  285:
+        -:  286:        char path[PATH_MAX];
+    #####:  287:        snprintf(path, sizeof(path), "/dev/input/%s", e->name);
+        -:  288:
+    #####:  289:        if (e->mask & (IN_CREATE | IN_ATTRIB))
+    %%%%%:  289-block  0
+    #####:  290:            openJoystickDevice(path);
+    %%%%%:  290-block  0
+    #####:  291:        else if (e->mask & IN_DELETE)
+    %%%%%:  291-block  0
+        -:  292:        {
+    #####:  293:            for (int jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
+    %%%%%:  293-block  0
+    %%%%%:  293-block  1
+    %%%%%:  293-block  2
+        -:  294:            {
+    #####:  295:                if (strcmp(_glfw.joysticks[jid].linjs.path, path) == 0)
+    %%%%%:  295-block  0
+        -:  296:                {
+    #####:  297:                    closeJoystick(_glfw.joysticks + jid);
+    %%%%%:  297-block  0
+    #####:  298:                    break;
+        -:  299:                }
+        -:  300:            }
+        -:  301:        }
+        -:  302:    }
+        -:  303:}
+        -:  304:
+        -:  305:
+        -:  306://////////////////////////////////////////////////////////////////////////
+        -:  307://////                       GLFW platform API                      //////
+        -:  308://////////////////////////////////////////////////////////////////////////
+        -:  309:
+    #####:  310:GLFWbool _glfwPlatformInitJoysticks(void)
+        -:  311:{
+    #####:  312:    const char* dirname = "/dev/input";
+        -:  313:
+    #####:  314:    _glfw.linjs.inotify = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+    %%%%%:  314-block  0
+    #####:  315:    if (_glfw.linjs.inotify > 0)
+        -:  316:    {
+        -:  317:        // HACK: Register for IN_ATTRIB to get notified when udev is done
+        -:  318:        //       This works well in practice but the true way is libudev
+        -:  319:
+    #####:  320:        _glfw.linjs.watch = inotify_add_watch(_glfw.linjs.inotify,
+    %%%%%:  320-block  0
+        -:  321:                                              dirname,
+        -:  322:                                              IN_CREATE | IN_ATTRIB | IN_DELETE);
+        -:  323:    }
+        -:  324:
+        -:  325:    // Continue without device connection notifications if inotify fails
+        -:  326:
+    #####:  327:    if (regcomp(&_glfw.linjs.regex, "^event[0-9]\\+$", 0) != 0)
+    %%%%%:  327-block  0
+        -:  328:    {
+    #####:  329:        _glfwInputError(GLFW_PLATFORM_ERROR, "Linux: Failed to compile regex");
+    %%%%%:  329-block  0
+    #####:  330:        return GLFW_FALSE;
+        -:  331:    }
+        -:  332:
+    #####:  333:    int count = 0;
+        -:  334:
+    #####:  335:    DIR* dir = opendir(dirname);
+    %%%%%:  335-block  0
+    #####:  336:    if (dir)
+        -:  337:    {
+        -:  338:        struct dirent* entry;
+        -:  339:
+    #####:  340:        while ((entry = readdir(dir)))
+    %%%%%:  340-block  0
+    %%%%%:  340-block  1
+        -:  341:        {
+        -:  342:            regmatch_t match;
+        -:  343:
+    #####:  344:            if (regexec(&_glfw.linjs.regex, entry->d_name, 1, &match, 0) != 0)
+    %%%%%:  344-block  0
+    #####:  345:                continue;
+    %%%%%:  345-block  0
+        -:  346:
+        -:  347:            char path[PATH_MAX];
+        -:  348:
+    #####:  349:            snprintf(path, sizeof(path), "%s/%s", dirname, entry->d_name);
+        -:  350:
+    #####:  351:            if (openJoystickDevice(path))
+    %%%%%:  351-block  0
+    #####:  352:                count++;
+    %%%%%:  352-block  0
+        -:  353:        }
+        -:  354:
+    #####:  355:        closedir(dir);
+    %%%%%:  355-block  0
+        -:  356:    }
+        -:  357:
+        -:  358:    // Continue with no joysticks if enumeration fails
+        -:  359:
+    #####:  360:    qsort(_glfw.joysticks, count, sizeof(_GLFWjoystick), compareJoysticks);
+    %%%%%:  360-block  0
+    #####:  361:    return GLFW_TRUE;
+        -:  362:}
+        -:  363:
+    #####:  364:void _glfwPlatformTerminateJoysticks(void)
+        -:  365:{
+        -:  366:    int jid;
+        -:  367:
+    #####:  368:    for (jid = 0;  jid <= GLFW_JOYSTICK_LAST;  jid++)
+    %%%%%:  368-block  0
+    %%%%%:  368-block  1
+    %%%%%:  368-block  2
+        -:  369:    {
+    #####:  370:        _GLFWjoystick* js = _glfw.joysticks + jid;
+    #####:  371:        if (js->present)
+    %%%%%:  371-block  0
+    #####:  372:            closeJoystick(js);
+    %%%%%:  372-block  0
+        -:  373:    }
+        -:  374:
+    #####:  375:    if (_glfw.linjs.inotify > 0)
+    %%%%%:  375-block  0
+        -:  376:    {
+    #####:  377:        if (_glfw.linjs.watch > 0)
+    %%%%%:  377-block  0
+    #####:  378:            inotify_rm_watch(_glfw.linjs.inotify, _glfw.linjs.watch);
+    %%%%%:  378-block  0
+        -:  379:
+    #####:  380:        close(_glfw.linjs.inotify);
+    %%%%%:  380-block  0
+    #####:  381:        regfree(&_glfw.linjs.regex);
+        -:  382:    }
+    #####:  383:}
+        -:  384:
+    #####:  385:int _glfwPlatformPollJoystick(_GLFWjoystick* js, int mode)
+        -:  386:{
+        -:  387:    // Read all queued events (non-blocking)
+        -:  388:    for (;;)
+    #####:  389:    {
+    %%%%%:  389-block  0
+        -:  390:        struct input_event e;
+        -:  391:
+    #####:  392:        errno = 0;
+    #####:  393:        if (read(js->linjs.fd, &e, sizeof(e)) < 0)
+    %%%%%:  393-block  0
+        -:  394:        {
+        -:  395:            // Reset the joystick slot if the device was disconnected
+    #####:  396:            if (errno == ENODEV)
+    %%%%%:  396-block  0
+    #####:  397:                closeJoystick(js);
+    %%%%%:  397-block  0
+        -:  398:
+    #####:  399:            break;
+        -:  400:        }
+        -:  401:
+    #####:  402:        if (e.type == EV_SYN)
+    %%%%%:  402-block  0
+        -:  403:        {
+    #####:  404:            if (e.code == SYN_DROPPED)
+    %%%%%:  404-block  0
+    #####:  405:                _glfw.linjs.dropped = GLFW_TRUE;
+    %%%%%:  405-block  0
+    #####:  406:            else if (e.code == SYN_REPORT)
+    %%%%%:  406-block  0
+        -:  407:            {
+    #####:  408:                _glfw.linjs.dropped = GLFW_FALSE;
+    #####:  409:                pollAbsState(js);
+    %%%%%:  409-block  0
+        -:  410:            }
+        -:  411:        }
+        -:  412:
+    #####:  413:        if (_glfw.linjs.dropped)
+    %%%%%:  413-block  0
+    #####:  414:            continue;
+    %%%%%:  414-block  0
+        -:  415:
+    #####:  416:        if (e.type == EV_KEY)
+    %%%%%:  416-block  0
+    #####:  417:            handleKeyEvent(js, e.code, e.value);
+    %%%%%:  417-block  0
+    #####:  418:        else if (e.type == EV_ABS)
+    %%%%%:  418-block  0
+    #####:  419:            handleAbsEvent(js, e.code, e.value);
+    %%%%%:  419-block  0
+        -:  420:    }
+        -:  421:
+    #####:  422:    return js->present;
+    %%%%%:  422-block  0
+        -:  423:}
+        -:  424:
+      176:  425:void _glfwPlatformUpdateGamepadGUID(char* guid)
+        -:  426:{
+      176:  427:}
+        -:  428:

@@ -1,0 +1,38 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/graphics/Camera.h
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/graphics/Camera.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/graphics/Camera.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// Created by kail on 30.12.2020.
+        -:    3://
+        -:    4:
+        -:    5:#ifndef OPENGL_CAMERA_H
+        -:    6:#define OPENGL_CAMERA_H
+        -:    7:
+        -:    8:#include <glad/glad.h>
+        -:    9:#include "glm/matrix.hpp"
+        -:   10:#include "glm/gtc/matrix_transform.hpp"
+        -:   11:
+        -:   12:using namespace glm;
+        -:   13:
+        -:   14:namespace SK {
+        -:   15:    namespace Render {
+        -:   16:        class Camera {
+        -:   17:        public:
+        -:   18:            //--------------------------------------------------------------------------------------------------------------------------------------------------------
+        -:   19:            Camera(const GLfloat x = 0, const GLfloat y = 0, const GLfloat w = 800, const GLfloat h = 600, const GLfloat zNear = -100.f, const GLfloat zFar = 100.f);
+        -:   20:            ~Camera() = default;
+        -:   21:
+        -:   22:            //--------------------------------------------------------------------------------------------------------------------------------------------------------
+        -:   23:            const mat4 getMatrix4() const;
+        -:   24:            void Move(const vec3& vecMove);
+        -:   25:            void Rotate(const GLfloat grad);
+        -:   26:        private:
+        -:   27:            //--------------------------------------------------------------------------------------------------------------------------------------------------------
+        -:   28:
+        1:   29:            glm::mat4 _Matrix4 =  mat4(1.f);
+        1:   29-block  0
+        -:   30:        };
+        -:   31:    }
+        -:   32:}
+        -:   33:#endif //OPENGL_CAMERA_H

@@ -1,0 +1,166 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/graphics/Sprite.h
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/Game.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/Game.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// Created by kail on 28.12.2020.
+        -:    3://
+        -:    4:
+        -:    5:#ifndef OPENGL_SPRITE_H
+        -:    6:#define OPENGL_SPRITE_H
+        -:    7:
+        -:    8:#include "glad/glad.h"
+        -:    9:#include "glm/glm.hpp"
+        -:   10:#include "glm/matrix.hpp"
+        -:   11:#include "glm/gtc/matrix_transform.hpp"
+        -:   12:#include "glm/vec2.hpp"
+        -:   13:
+        -:   14:
+        -:   15:#include "memory"
+        -:   16:#include "string"
+        -:   17:
+        -:   18:#include "Texture.h"
+        -:   19:#include "Shader.h"
+        -:   20:
+        -:   21:namespace SK {
+        -:   22:    namespace Render {
+        -:   23:        class Sprite {
+        -:   24:        public:
+        -:   25:            Sprite()=delete;
+        1:   26:            Sprite(const std::string& ShaderName , const std::string& TextureName,
+        -:   27:                   const glm::vec2& position,
+        -:   28:                   const glm::vec2& size,
+        1:   29:                   const float rotation):
+        -:   30:                   _position(position),
+        -:   31:                   _size(size),
+        1:   32:                   _rotation(rotation){
+        1:   33:                _shader  = ResourcesManager::getShaderByName(ShaderName);
+        1:   33-block  0
+        1:   34:                _texture = ResourcesManager::getTextureByName(TextureName);
+        1:   34-block  0
+        -:   35:
+        1:   36:                GLfloat vertices[] = {
+        -:   37:                        // Позиции          // Цвета             // Текстурные координаты
+        -:   38:                        1.f,  1.0f, 0.0f,    1.0f, 1.0f,   // Верхний правый
+        -:   39:                        1.f, -1.f, 0.0f,    1.0f, 0.0f,   // Нижний правый
+        -:   40:                        -1.f, -1.f, 0.0f,    0.0f, 0.0f,   // Нижний левый
+        -:   41:                        -1.f,  1.f, 0.0f,    0.0f, 1.0f    // Верхний левый
+        -:   42:                };
+        1:   43:                GLuint indices[] = {  // Note that we start from 0!
+        -:   44:                        0, 1, 3,  // First Triangle
+        -:   45:                        1, 2, 3   // Second Triangle
+        -:   46:                };
+        -:   47:                GLuint VBO, VAO, EBO,VBO_TEXTURE ;
+        1:   48:                glGenVertexArrays(1, &VAO);
+        1:   48-block  0
+        -:   49:                //glGenBuffers(1,&VBO_COLOR);
+        1:   50:                glGenBuffers(1, &VBO_TEXTURE);
+        1:   50-block  0
+        1:   51:                glGenBuffers(1, &VBO);
+        1:   51-block  0
+        1:   52:                glGenBuffers(1, &EBO);
+        1:   52-block  0
+        -:   53:
+        1:   54:                glBindVertexArray(VAO);
+        1:   54-block  0
+        -:   55:
+        1:   56:                glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        1:   56-block  0
+        1:   57:                glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        1:   57-block  0
+        1:   58:                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+        1:   58-block  0
+        1:   59:                glEnableVertexAttribArray(0);
+        1:   59-block  0
+        -:   60:
+        1:   61:                glBindBuffer(GL_ARRAY_BUFFER, VBO_TEXTURE);
+        1:   61-block  0
+        1:   62:                glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        1:   62-block  0
+        1:   63:                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3*sizeof (GLfloat)));
+        1:   63-block  0
+        1:   64:                glEnableVertexAttribArray(1);
+        1:   64-block  0
+        -:   65:
+        1:   66:                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        1:   66-block  0
+        1:   67:                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+        1:   67-block  0
+        -:   68:
+        1:   69:                glBindBuffer(GL_ARRAY_BUFFER, 0);
+        1:   69-block  0
+        1:   70:                glBindVertexArray(0);
+        1:   70-block  0
+        -:   71:
+        -:   72:
+        1:   73:                vao = VAO;
+        1:   74:                vbo = VBO;
+        1:   75:                ebo = EBO;
+        -:   76:             
+        -:   77:
+        1:   78:            }
+        1:   78-block  0
+        -:   79:            ~Sprite() {
+        -:   80:
+        -:   81:            }
+        -:   82:
+      515:   83:            void render() {
+      515:   84:                _shader->use();
+      515:   84-block  0
+      515:   85:                _texture->bind();
+      515:   85-block  0
+        -:   86:
+      515:   87:                glm::mat4 model(1.f);
+        -:   88:
+        -:   89:
+      515:   90:                model = glm::translate(model , glm::vec3(_position , 0.f));
+      515:   90-block  0
+    $$$$$:   90-block  1
+      515:   91:                model = glm::translate(model, glm::vec3(0.5f * ResourcesManager::WINDOW_W , 0.5 * ResourcesManager::WINDOW_H ,0.f));
+      515:   91-block  0
+    $$$$$:   91-block  1
+      515:   92:                model = glm::rotate(model , glm::radians(_rotation),glm::vec3(0.f,0.f,1.f));
+      515:   92-block  0
+    $$$$$:   92-block  1
+      515:   93:                model = glm::translate(model, glm::vec3(-0.5f * ResourcesManager::WINDOW_W , -0.5 * ResourcesManager::WINDOW_H ,0.f));
+      515:   93-block  0
+    $$$$$:   93-block  1
+      515:   94:                model = glm::scale(model,glm::vec3(_size,1.f));
+      515:   94-block  0
+    $$$$$:   94-block  1
+      515:   95:                _shader->setMatrix4("model",model);
+      515:   95-block  0
+      515:   95-block  1
+      515:   95-block  2
+    $$$$$:   95-block  3
+    $$$$$:   95-block  4
+    $$$$$:   95-block  5
+    $$$$$:   95-block  6
+        -:   96:
+        -:   97:
+      515:   98:                glBindVertexArray(vao);
+      515:   99:                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      515:   99-block  0
+      515:  100:                glBindVertexArray(0);
+      515:  100-block  0
+      515:  101:            }
+      515:  101-block  0
+        -:  102:        private:
+        -:  103:            GLuint vao = 0;
+        -:  104:            GLuint vbo = 0;
+        -:  105:            GLuint ebo = 0;
+        -:  106:            GLuint tex = 0;
+        -:  107:
+        -:  108:            Shader* _shader;
+        -:  109:            Texture* _texture;
+        -:  110:
+        -:  111:
+        -:  112:            glm::vec2   _position;
+        -:  113:            glm::vec2   _size;
+        -:  114:            float       _rotation;
+        -:  115:
+        -:  116:        };
+        -:  117:
+        -:  118:    }
+        -:  119:}
+        -:  120:#endif //OPENGL_SPRITE_H

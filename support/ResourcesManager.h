@@ -76,7 +76,7 @@ public:
     //---SUPPORT---
     static string FileToString(const string &path) {
         std::ifstream f;
-        f.open(_defaultPath + "\\" + path.c_str() ,std::ios::in | std::ios::binary);
+        f.open( path.c_str() ,std::ios::in | std::ios::binary);
         if (!f.is_open()){
             cout << "WARNING :file not found - " << path << "\n";
         }

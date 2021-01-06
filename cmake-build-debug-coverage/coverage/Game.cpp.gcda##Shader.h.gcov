@@ -1,0 +1,125 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/graphics/Shader.h
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/Game.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/Game.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// Created by kail on 27.12.2020.
+        -:    3://
+        -:    4:
+        -:    5:#ifndef OPENGL_SHADER_H
+        -:    6:#define OPENGL_SHADER_H
+        -:    7:
+        -:    8:#include <glad/glad.h>
+        -:    9:#include <sstream>
+        -:   10:#include "string"
+        -:   11:#include "../support//ResourcesManager.h"
+        -:   12:#include "ios"
+        -:   13:#include "fstream"
+        -:   14:
+        -:   15:#include "glm/glm.hpp"
+        -:   16:#include "glm/gtc/type_ptr.hpp"
+        -:   17:
+        -:   18:using std::string;
+        -:   19:using std::cout;
+        -:   20:
+        -:   21:namespace SK {
+        -:   22:    namespace Render {
+        -:   23:        class Shader {
+        -:   24:        public:
+        -:   25:            //################################################################################################################################
+        -:   26:            Shader(const string &vertSorce, const string &fragSorce) {
+        -:   27:                GLuint vertS = 0;
+        -:   28:                vertS = glCreateShader(GL_VERTEX_SHADER);
+        -:   29:                {
+        -:   30:                    auto s = vertSorce.c_str();
+        -:   31:                    glShaderSource(vertS, 1, &s, nullptr);
+        -:   32:                }
+        -:   33:                glCompileShader(vertS);
+        -:   34:                {//---
+        -:   35:                    GLint wtf = 0;
+        -:   36:                    glGetShaderiv(vertS, GL_COMPILE_STATUS, &wtf);
+        -:   37:                    if (wtf != GL_TRUE) {
+        -:   38:                        GLsizei log_length = 0;
+        -:   39:                        GLchar message[1024];
+        -:   40:                        glGetShaderInfoLog(vertS, 1024, &log_length, message);
+        -:   41:                        cout << "ERROR :: compile vertex shader - " << message << "\n";\
+        -:   42:                    exit(3);
+        -:   43:                    }
+        -:   44:                }//---
+        -:   45:
+        -:   46:                GLuint fragS = 0;
+        -:   47:                fragS = glCreateShader(GL_FRAGMENT_SHADER);
+        -:   48:                {
+        -:   49:                    auto s = fragSorce.c_str();
+        -:   50:                    glShaderSource(fragS, 1, &s, nullptr);
+        -:   51:                }
+        -:   52:                glCompileShader(fragS);
+        -:   53:                {//---
+        -:   54:                    GLint wtf = 0;
+        -:   55:                    glGetShaderiv(fragS, GL_COMPILE_STATUS, &wtf);
+        -:   56:                    if (wtf != GL_TRUE) {
+        -:   57:                        GLsizei log_length = 0;
+        -:   58:                        GLchar message[1024];
+        -:   59:                        glGetShaderInfoLog(vertS, 1024, &log_length, message);
+        -:   60:                        cout << "ERROR :: compile fragment shader - " << message << "\n";\
+        -:   61:                    exit(3);
+        -:   62:                    }
+        -:   63:                }//---
+        -:   64:
+        -:   65:                GLint ShaderProgram = 0;
+        -:   66:                ShaderProgram = glCreateProgram();
+        -:   67:
+        -:   68:                glAttachShader(ShaderProgram, vertS);
+        -:   69:                glAttachShader(ShaderProgram, fragS);
+        -:   70:                glLinkProgram(ShaderProgram);
+        -:   71:
+        -:   72:                GLint program_linked;
+        -:   73:                glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &program_linked);
+        -:   74:                if (program_linked != GL_TRUE) {
+        -:   75:                    GLsizei log_length = 0;
+        -:   76:                    GLchar message[1024];
+        -:   77:                    glGetProgramInfoLog(ShaderProgram, 1024, &log_length, message);
+        -:   78:                    cout << "ERROR :: compile shader program- " << message << "\n";\
+        -:   79:                exit(3);
+        -:   80:                }
+        -:   81:
+        -:   82:                glDeleteShader(vertS);
+        -:   83:                glDeleteShader(fragS);
+        -:   84:
+        -:   85:                ID = ShaderProgram;
+        -:   86:                _isCompile = true;
+        -:   87:            }
+        -:   88:            //################################################################################################################################
+      516:   89:            void use() const {
+      516:   90:                glUseProgram(ID);
+      516:   90-block  0
+      516:   91:            }
+        -:   92:            //################################################################################################################################
+        -:   93:            void setInt(const string &UniformName, const GLint value) {
+        -:   94:                glUniform1i(glGetUniformLocation(ID, UniformName.c_str()), value);
+        -:   95:            }
+      515:   96:            void setFloat1(const string &UniformName, const GLfloat value) {
+      515:   97:                glUniform1f(glGetUniformLocation(ID, UniformName.c_str()), value);
+      515:   97-block  0
+      515:   98:            }
+     1030:   99:            void setFloat2(const string &UniformName, const GLfloat value1 ,const GLfloat value2) {
+     1030:  100:                glUniform2f(glGetUniformLocation(ID, UniformName.c_str()), value1,value2);
+     1030:  100-block  0
+     1030:  101:            }
+        -:  102:            //################################################################################################################################
+      517:  103:            void setMatrix4(const std::string &UniformName, const glm::mat4 matrix) {
+      517:  104:                glUniformMatrix4fv(glGetUniformLocation(ID, UniformName.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+      517:  104-block  0
+      517:  105:            }
+        -:  106:            //################################################################################################################################
+        -:  107:            const GLuint getID(){return ID;}
+        -:  108:            //################################################################################################################################
+        -:  109:        private:
+        -:  110:            GLuint ID;
+        -:  111:            bool _isCompile = false;
+        -:  112:        public:
+        -:  113:            ~Shader() { glDeleteProgram(ID); }
+        -:  114:        };
+        -:  115:    }
+        -:  116:}
+        -:  117:#endif //OPENGL_SHADER_H

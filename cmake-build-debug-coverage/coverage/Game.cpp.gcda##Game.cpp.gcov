@@ -1,0 +1,175 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/game/Game.cpp
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/Game.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/Game.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// Created by kail on 28.12.2020.
+        -:    3://
+        -:    4:
+        -:    5:
+        -:    6:
+        -:    7:
+        -:    8:#include "Game.h"
+        -:    9:
+        -:   10:
+        1:   11:void Game::Init()
+        -:   12:{
+       1*:   13:    if (!ResourcesManager::InitGLFW()){ResourcesManager::Destroy();exit(404);}
+        1:   13-block  0
+        1:   13-block  1
+    %%%%%:   13-block  2
+    %%%%%:   13-block  3
+       1*:   14:    if (!ResourcesManager::InitGLAD()){ResourcesManager::Destroy();exit(404);}
+        1:   14-block  0
+        1:   14-block  1
+    %%%%%:   14-block  2
+    %%%%%:   14-block  3
+        1:   15:    ResourcesManager::createShaderProgram(defaultVertexShaderPath, defaultFragmentShaderPath, defaultShaderName);
+        1:   15-block  0
+        1:   16:    ResourcesManager::createTexture("res/4.png","def");
+        1:   16-block  0
+        1:   16-block  1
+        1:   16-block  2
+        1:   16-block  3
+    $$$$$:   16-block  4
+    $$$$$:   16-block  5
+    $$$$$:   16-block  6
+    $$$$$:   16-block  7
+    $$$$$:   16-block  8
+    $$$$$:   16-block  9
+    $$$$$:   16-block 10
+    $$$$$:   16-block 11
+        1:   17:    window = ResourcesManager::getWindow();
+        1:   18:    glClearColor(1,1,0,0);
+        -:   19:
+        -:   20:
+        1:   21:    s = new SK::Render::Sprite(defaultShaderName,"def",glm::vec2(400,300),glm::vec2(100, 100),0);
+        1:   21-block  0
+        1:   21-block  1
+        1:   21-block  2
+        1:   21-block  3
+    $$$$$:   21-block  4
+    $$$$$:   21-block  5
+    $$$$$:   21-block  6
+    $$$$$:   21-block  7
+    $$$$$:   21-block  8
+    $$$$$:   21-block  9
+    $$$$$:   21-block 10
+        -:   22:
+        -:   23:    //------------------------
+        1:   24:    glm::mat4 view(1.f);
+        1:   25:    glm::mat4 projection(1.f);
+        -:   26:
+        1:   27:    SK::Render::Camera cam(0,0,800,600);
+        -:   28:
+        1:   29:    projection = cam.getMatrix4();
+        1:   29-block  0
+        -:   30:    //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        -:   31:    //projection = glm::perspective(45.0f, (GLfloat)800 / (GLfloat)600, 0.1f, 100.0f);
+        -:   32:
+        -:   33:    
+        -:   34:
+        1:   35:    ResourcesManager::getShaderByName(defaultShaderName)->use();
+        1:   35-block  0
+        1:   35-block  1
+        1:   36:    ResourcesManager::getShaderByName(defaultShaderName)->setMatrix4("view",view);
+        1:   36-block  0
+        1:   36-block  1
+        1:   36-block  2
+        1:   36-block  3
+    $$$$$:   36-block  4
+    $$$$$:   36-block  5
+    $$$$$:   36-block  6
+    $$$$$:   36-block  7
+        1:   37:    ResourcesManager::getShaderByName(defaultShaderName)->setMatrix4("projection",projection);
+        1:   37-block  0
+        1:   37-block  1
+        1:   37-block  2
+    $$$$$:   37-block  3
+    $$$$$:   37-block  4
+    $$$$$:   37-block  5
+    $$$$$:   37-block  6
+        -:   38:
+        -:   39:
+        -:   40:
+        -:   41:
+        -:   42:    
+        -:   43:
+        -:   44:
+        1:   45:    Events::Init();
+        -:   46:    //------------------------
+        1:   47:}
+        1:   47-block  0
+        -:   48:
+      515:   49:void Game::Render()
+        -:   50:{
+      515:   51:    glClear(GL_COLOR_BUFFER_BIT);
+      515:   51-block  0
+        -:   52:
+        -:   53:
+        -:   54:    static GLfloat time = 0.f;
+      515:   55:    time += 0.001f;
+        -:   56:    double xpos, ypos;
+      515:   57:    glfwGetCursorPos(window, &xpos, &ypos);
+      515:   57-block  0
+        -:   58:
+        -:   59:
+      515:   60:    ResourcesManager::getShaderByName(defaultShaderName)->setFloat1("time",time);
+      515:   60-block  0
+      515:   60-block  1
+      515:   60-block  2
+      515:   60-block  3
+    $$$$$:   60-block  4
+    $$$$$:   60-block  5
+    $$$$$:   60-block  6
+    $$$$$:   60-block  7
+      515:   61:    ResourcesManager::getShaderByName(defaultShaderName)->setFloat2("resolution",ResourcesManager::WINDOW_W,ResourcesManager::WINDOW_H);
+      515:   61-block  0
+      515:   61-block  1
+      515:   61-block  2
+    $$$$$:   61-block  3
+    $$$$$:   61-block  4
+    $$$$$:   61-block  5
+    $$$$$:   61-block  6
+      515:   62:    ResourcesManager::getShaderByName(defaultShaderName)->setFloat2("mouse",xpos / 230,ypos / 230);
+      515:   62-block  0
+      515:   62-block  1
+      515:   62-block  2
+    $$$$$:   62-block  3
+    $$$$$:   62-block  4
+    $$$$$:   62-block  5
+    $$$$$:   62-block  6
+        -:   63:
+        -:   64:
+      515:   65:    s->render();
+        -:   66:
+        -:   67:    
+        -:   68:
+        -:   69:
+      515:   70:    glfwSwapBuffers(window);
+      515:   70-block  0
+      515:   71:}
+      515:   71-block  0
+        -:   72:
+        -:   73:
+      534:   74:void Game::Update()
+        -:   75:{
+      534:   76:    Events::PoolEvents();
+      534:   76-block  0
+      534:   77:    if (Events::jPressed(GLFW_KEY_ESCAPE) || glfwWindowShouldClose(ResourcesManager::getWindow()))
+      534:   77-block  0
+      534:   77-block  1
+      534:   77-block  2
+        1:   77-block  3
+      533:   77-block  4
+      534:   77-block  5
+        1:   78:        isRunning = false;
+        1:   78-block  0
+      534:   79:}
+      534:   79-block  0
+        -:   80:
+        -:   81:
+        1:   82:void Game::Dispose()
+        -:   83:{
+        -:   84:
+        1:   85:}

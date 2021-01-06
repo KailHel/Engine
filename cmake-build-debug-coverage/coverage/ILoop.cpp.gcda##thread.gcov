@@ -1,0 +1,434 @@
+        -:    0:Source:/usr/include/c++/9/thread
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/ILoop.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/game/ILoop.cpp.gcda
+        -:    0:Runs:1
+        -:    1:// <thread> -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2008-2019 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/** @file include/thread
+        -:   26: *  This is a Standard C++ Library header.
+        -:   27: */
+        -:   28:
+        -:   29:#ifndef _GLIBCXX_THREAD
+        -:   30:#define _GLIBCXX_THREAD 1
+        -:   31:
+        -:   32:#pragma GCC system_header
+        -:   33:
+        -:   34:#if __cplusplus < 201103L
+        -:   35:# include <bits/c++0x_warning.h>
+        -:   36:#else
+        -:   37:
+        -:   38:#include <chrono>
+        -:   39:#include <memory>
+        -:   40:#include <tuple>
+        -:   41:#include <cerrno>
+        -:   42:#include <bits/functexcept.h>
+        -:   43:#include <bits/functional_hash.h>
+        -:   44:#include <bits/invoke.h>
+        -:   45:#include <bits/gthr.h>
+        -:   46:
+        -:   47:#if defined(_GLIBCXX_HAS_GTHREADS)
+        -:   48:
+        -:   49:namespace std _GLIBCXX_VISIBILITY(default)
+        -:   50:{
+        -:   51:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:   52:
+        -:   53:  /**
+        -:   54:   * @defgroup threads Threads
+        -:   55:   * @ingroup concurrency
+        -:   56:   *
+        -:   57:   * Classes for thread support.
+        -:   58:   * @{
+        -:   59:   */
+        -:   60:
+        -:   61:  /// thread
+        -:   62:  class thread
+        -:   63:  {
+        -:   64:  public:
+        -:   65:    // Abstract base class for types that wrap arbitrary functors to be
+        -:   66:    // invoked in the new thread of execution.
+        -:   67:    struct _State
+        -:   68:    {
+        -:   69:      virtual ~_State();
+        -:   70:      virtual void _M_run() = 0;
+        -:   71:    };
+        -:   72:    using _State_ptr = unique_ptr<_State>;
+        -:   73:
+        -:   74:    typedef __gthread_t			native_handle_type;
+        -:   75:
+        -:   76:    /// thread::id
+        -:   77:    class id
+        -:   78:    {
+        -:   79:      native_handle_type	_M_thread;
+        -:   80:
+        -:   81:    public:
+        -:   82:      id() noexcept : _M_thread() { }
+        -:   83:
+        -:   84:      explicit
+        -:   85:      id(native_handle_type __id) : _M_thread(__id) { }
+        -:   86:
+        -:   87:    private:
+        -:   88:      friend class thread;
+        -:   89:      friend class hash<thread::id>;
+        -:   90:
+        -:   91:      friend bool
+        -:   92:      operator==(thread::id __x, thread::id __y) noexcept;
+        -:   93:
+        -:   94:      friend bool
+        -:   95:      operator<(thread::id __x, thread::id __y) noexcept;
+        -:   96:
+        -:   97:      template<class _CharT, class _Traits>
+        -:   98:	friend basic_ostream<_CharT, _Traits>&
+        -:   99:	operator<<(basic_ostream<_CharT, _Traits>& __out, thread::id __id);
+        -:  100:    };
+        -:  101:
+        -:  102:  private:
+        -:  103:    id				_M_id;
+        -:  104:
+        -:  105:    // _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -:  106:    // 2097.  packaged_task constructors should be constrained
+        -:  107:    // 3039. Unnecessary decay in thread and packaged_task
+        -:  108:    template<typename _Tp>
+        -:  109:      using __not_same = __not_<is_same<__remove_cvref_t<_Tp>, thread>>;
+        -:  110:
+        -:  111:  public:
+        -:  112:    thread() noexcept = default;
+        -:  113:
+        -:  114:    template<typename _Callable, typename... _Args,
+        -:  115:	     typename = _Require<__not_same<_Callable>>>
+        -:  116:      explicit
+        -:  117:      thread(_Callable&& __f, _Args&&... __args)
+        -:  118:      {
+        -:  119:	static_assert( __is_invocable<typename decay<_Callable>::type,
+        -:  120:				      typename decay<_Args>::type...>::value,
+        -:  121:	  "std::thread arguments must be invocable after conversion to rvalues"
+        -:  122:	  );
+        -:  123:
+        -:  124:#ifdef GTHR_ACTIVE_PROXY
+        -:  125:	// Create a reference to pthread_create, not just the gthr weak symbol.
+        -:  126:	auto __depend = reinterpret_cast<void(*)()>(&pthread_create);
+        -:  127:#else
+        -:  128:	auto __depend = nullptr;
+        -:  129:#endif
+        -:  130:        _M_start_thread(_S_make_state(
+        -:  131:	      __make_invoker(std::forward<_Callable>(__f),
+        -:  132:			     std::forward<_Args>(__args)...)),
+        -:  133:	    __depend);
+        -:  134:      }
+        -:  135:
+        -:  136:    ~thread()
+        -:  137:    {
+        -:  138:      if (joinable())
+        -:  139:	std::terminate();
+        -:  140:    }
+        -:  141:
+        -:  142:    thread(const thread&) = delete;
+        -:  143:
+        -:  144:    thread(thread&& __t) noexcept
+        -:  145:    { swap(__t); }
+        -:  146:
+        -:  147:    thread& operator=(const thread&) = delete;
+        -:  148:
+        -:  149:    thread& operator=(thread&& __t) noexcept
+        -:  150:    {
+        -:  151:      if (joinable())
+        -:  152:	std::terminate();
+        -:  153:      swap(__t);
+        -:  154:      return *this;
+        -:  155:    }
+        -:  156:
+        -:  157:    void
+        -:  158:    swap(thread& __t) noexcept
+        -:  159:    { std::swap(_M_id, __t._M_id); }
+        -:  160:
+        -:  161:    bool
+        -:  162:    joinable() const noexcept
+        -:  163:    { return !(_M_id == id()); }
+        -:  164:
+        -:  165:    void
+        -:  166:    join();
+        -:  167:
+        -:  168:    void
+        -:  169:    detach();
+        -:  170:
+        -:  171:    thread::id
+        -:  172:    get_id() const noexcept
+        -:  173:    { return _M_id; }
+        -:  174:
+        -:  175:    /** @pre thread is joinable
+        -:  176:     */
+        -:  177:    native_handle_type
+        -:  178:    native_handle()
+        -:  179:    { return _M_id._M_thread; }
+        -:  180:
+        -:  181:    // Returns a value that hints at the number of hardware thread contexts.
+        -:  182:    static unsigned int
+        -:  183:    hardware_concurrency() noexcept;
+        -:  184:
+        -:  185:  private:
+        -:  186:    template<typename _Callable>
+        -:  187:      struct _State_impl : public _State
+        -:  188:      {
+        -:  189:	_Callable		_M_func;
+        -:  190:
+        -:  191:	_State_impl(_Callable&& __f) : _M_func(std::forward<_Callable>(__f))
+        -:  192:	{ }
+        -:  193:
+        -:  194:	void
+        -:  195:	_M_run() { _M_func(); }
+        -:  196:      };
+        -:  197:
+        -:  198:    void
+        -:  199:    _M_start_thread(_State_ptr, void (*)());
+        -:  200:
+        -:  201:    template<typename _Callable>
+        -:  202:      static _State_ptr
+        -:  203:      _S_make_state(_Callable&& __f)
+        -:  204:      {
+        -:  205:	using _Impl = _State_impl<_Callable>;
+        -:  206:	return _State_ptr{new _Impl{std::forward<_Callable>(__f)}};
+        -:  207:      }
+        -:  208:#if _GLIBCXX_THREAD_ABI_COMPAT
+        -:  209:  public:
+        -:  210:    struct _Impl_base;
+        -:  211:    typedef shared_ptr<_Impl_base>	__shared_base_type;
+        -:  212:    struct _Impl_base
+        -:  213:    {
+        -:  214:      __shared_base_type	_M_this_ptr;
+        -:  215:      virtual ~_Impl_base() = default;
+        -:  216:      virtual void _M_run() = 0;
+        -:  217:    };
+        -:  218:
+        -:  219:  private:
+        -:  220:    void
+        -:  221:    _M_start_thread(__shared_base_type, void (*)());
+        -:  222:
+        -:  223:    void
+        -:  224:    _M_start_thread(__shared_base_type);
+        -:  225:#endif
+        -:  226:
+        -:  227:  private:
+        -:  228:    // A call wrapper that does INVOKE(forwarded tuple elements...)
+        -:  229:    template<typename _Tuple>
+        -:  230:      struct _Invoker
+        -:  231:      {
+        -:  232:	_Tuple _M_t;
+        -:  233:
+        -:  234:	template<typename>
+        -:  235:	  struct __result;
+        -:  236:	template<typename _Fn, typename... _Args>
+        -:  237:	  struct __result<tuple<_Fn, _Args...>>
+        -:  238:	  : __invoke_result<_Fn, _Args...>
+        -:  239:	  { };
+        -:  240:
+        -:  241:	template<size_t... _Ind>
+        -:  242:	  typename __result<_Tuple>::type
+        -:  243:	  _M_invoke(_Index_tuple<_Ind...>)
+        -:  244:	  { return std::__invoke(std::get<_Ind>(std::move(_M_t))...); }
+        -:  245:
+        -:  246:	typename __result<_Tuple>::type
+        -:  247:	operator()()
+        -:  248:	{
+        -:  249:	  using _Indices
+        -:  250:	    = typename _Build_index_tuple<tuple_size<_Tuple>::value>::__type;
+        -:  251:	  return _M_invoke(_Indices());
+        -:  252:	}
+        -:  253:      };
+        -:  254:
+        -:  255:    template<typename... _Tp>
+        -:  256:      using __decayed_tuple = tuple<typename decay<_Tp>::type...>;
+        -:  257:
+        -:  258:  public:
+        -:  259:    // Returns a call wrapper that stores
+        -:  260:    // tuple{DECAY_COPY(__callable), DECAY_COPY(__args)...}.
+        -:  261:    template<typename _Callable, typename... _Args>
+        -:  262:      static _Invoker<__decayed_tuple<_Callable, _Args...>>
+        -:  263:      __make_invoker(_Callable&& __callable, _Args&&... __args)
+        -:  264:      {
+        -:  265:	return { __decayed_tuple<_Callable, _Args...>{
+        -:  266:	    std::forward<_Callable>(__callable), std::forward<_Args>(__args)...
+        -:  267:	} };
+        -:  268:      }
+        -:  269:  };
+        -:  270:
+        -:  271:  inline void
+        -:  272:  swap(thread& __x, thread& __y) noexcept
+        -:  273:  { __x.swap(__y); }
+        -:  274:
+        -:  275:  inline bool
+        -:  276:  operator==(thread::id __x, thread::id __y) noexcept
+        -:  277:  {
+        -:  278:    // pthread_equal is undefined if either thread ID is not valid, so we
+        -:  279:    // can't safely use __gthread_equal on default-constructed values (nor
+        -:  280:    // the non-zero value returned by this_thread::get_id() for
+        -:  281:    // single-threaded programs using GNU libc). Assume EqualityComparable.
+        -:  282:    return __x._M_thread == __y._M_thread;
+        -:  283:  }
+        -:  284:
+        -:  285:  inline bool
+        -:  286:  operator!=(thread::id __x, thread::id __y) noexcept
+        -:  287:  { return !(__x == __y); }
+        -:  288:
+        -:  289:  inline bool
+        -:  290:  operator<(thread::id __x, thread::id __y) noexcept
+        -:  291:  {
+        -:  292:    // Pthreads doesn't define any way to do this, so we just have to
+        -:  293:    // assume native_handle_type is LessThanComparable.
+        -:  294:    return __x._M_thread < __y._M_thread;
+        -:  295:  }
+        -:  296:
+        -:  297:  inline bool
+        -:  298:  operator<=(thread::id __x, thread::id __y) noexcept
+        -:  299:  { return !(__y < __x); }
+        -:  300:
+        -:  301:  inline bool
+        -:  302:  operator>(thread::id __x, thread::id __y) noexcept
+        -:  303:  { return __y < __x; }
+        -:  304:
+        -:  305:  inline bool
+        -:  306:  operator>=(thread::id __x, thread::id __y) noexcept
+        -:  307:  { return !(__x < __y); }
+        -:  308:
+        -:  309:  // DR 889.
+        -:  310:  /// std::hash specialization for thread::id.
+        -:  311:  template<>
+        -:  312:    struct hash<thread::id>
+        -:  313:    : public __hash_base<size_t, thread::id>
+        -:  314:    {
+        -:  315:      size_t
+        -:  316:      operator()(const thread::id& __id) const noexcept
+        -:  317:      { return std::_Hash_impl::hash(__id._M_thread); }
+        -:  318:    };
+        -:  319:
+        -:  320:  template<class _CharT, class _Traits>
+        -:  321:    inline basic_ostream<_CharT, _Traits>&
+        -:  322:    operator<<(basic_ostream<_CharT, _Traits>& __out, thread::id __id)
+        -:  323:    {
+        -:  324:      if (__id == thread::id())
+        -:  325:	return __out << "thread::id of a non-executing thread";
+        -:  326:      else
+        -:  327:	return __out << __id._M_thread;
+        -:  328:    }
+        -:  329:
+        -:  330:  /** @namespace std::this_thread
+        -:  331:   *  @brief ISO C++ 2011 entities sub-namespace for thread.
+        -:  332:   *  30.3.2 Namespace this_thread.
+        -:  333:   */
+        -:  334:  namespace this_thread
+        -:  335:  {
+        -:  336:    /// get_id
+        -:  337:    inline thread::id
+        -:  338:    get_id() noexcept
+        -:  339:    {
+        -:  340:#ifdef __GLIBC__
+        -:  341:      // For the GNU C library pthread_self() is usable without linking to
+        -:  342:      // libpthread.so but returns 0, so we cannot use it in single-threaded
+        -:  343:      // programs, because this_thread::get_id() != thread::id{} must be true.
+        -:  344:      // We know that pthread_t is an integral type in the GNU C library.
+        -:  345:      if (!__gthread_active_p())
+        -:  346:	return thread::id(1);
+        -:  347:#endif
+        -:  348:      return thread::id(__gthread_self());
+        -:  349:    }
+        -:  350:
+        -:  351:    /// yield
+        -:  352:    inline void
+        -:  353:    yield() noexcept
+        -:  354:    {
+        -:  355:#ifdef _GLIBCXX_USE_SCHED_YIELD
+        -:  356:      __gthread_yield();
+        -:  357:#endif
+        -:  358:    }
+        -:  359:
+        -:  360:    void
+        -:  361:    __sleep_for(chrono::seconds, chrono::nanoseconds);
+        -:  362:
+        -:  363:    /// sleep_for
+        -:  364:    template<typename _Rep, typename _Period>
+        -:  365:      inline void
+      834:  366:      sleep_for(const chrono::duration<_Rep, _Period>& __rtime)
+        -:  367:      {
+      834:  368:	if (__rtime <= __rtime.zero())
+      834:  368-block  0
+      834:  368-block  1
+    $$$$$:  368-block  2
+    #####:  369:	  return;
+    %%%%%:  369-block  0
+      834:  370:	auto __s = chrono::duration_cast<chrono::seconds>(__rtime);
+      834:  370-block  0
+      834:  371:	auto __ns = chrono::duration_cast<chrono::nanoseconds>(__rtime - __s);
+      834:  371-block  0
+      834:  371-block  1
+    $$$$$:  371-block  2
+        -:  372:#ifdef _GLIBCXX_USE_NANOSLEEP
+      834:  373:	__gthread_time_t __ts =
+        -:  374:	  {
+      834:  375:	    static_cast<std::time_t>(__s.count()),
+      834:  375-block  0
+      834:  376:	    static_cast<long>(__ns.count())
+        -:  377:	  };
+     834*:  378:	while (::nanosleep(&__ts, &__ts) == -1 && errno == EINTR)
+      834:  378-block  0
+      834:  378-block  1
+    %%%%%:  378-block  2
+    %%%%%:  378-block  3
+      834:  378-block  4
+      834:  378-block  5
+    %%%%%:  378-block  6
+        -:  379:	  { }
+        -:  380:#else
+        -:  381:	__sleep_for(__s, __ns);
+        -:  382:#endif
+        -:  383:      }
+        -:  384:
+        -:  385:    /// sleep_until
+        -:  386:    template<typename _Clock, typename _Duration>
+        -:  387:      inline void
+        -:  388:      sleep_until(const chrono::time_point<_Clock, _Duration>& __atime)
+        -:  389:      {
+        -:  390:	auto __now = _Clock::now();
+        -:  391:	if (_Clock::is_steady)
+        -:  392:	  {
+        -:  393:	    if (__now < __atime)
+        -:  394:	      sleep_for(__atime - __now);
+        -:  395:	    return;
+        -:  396:	  }
+        -:  397:	while (__now < __atime)
+        -:  398:	  {
+        -:  399:	    sleep_for(__atime - __now);
+        -:  400:	    __now = _Clock::now();
+        -:  401:	  }
+        -:  402:      }
+        -:  403:  }
+        -:  404:
+        -:  405:  // @} group threads
+        -:  406:
+        -:  407:_GLIBCXX_END_NAMESPACE_VERSION
+        -:  408:} // namespace
+        -:  409:
+        -:  410:#endif // _GLIBCXX_HAS_GTHREADS
+        -:  411:
+        -:  412:#endif // C++11
+        -:  413:
+        -:  414:#endif // _GLIBCXX_THREAD

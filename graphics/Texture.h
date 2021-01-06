@@ -43,12 +43,6 @@ namespace SK {
 
                 delete data;
             }
-
-            Texture() = delete;
-
-            ~Texture() {
-                glDeleteTextures(1, &ID);
-            }
             //################################################################################################################################
             void bind() const {
                 glBindTexture(GL_TEXTURE_2D, ID);
@@ -58,7 +52,14 @@ namespace SK {
             GLuint ID;
             unsigned int _width = 0;
             unsigned int _height = 0;
-
+        public:
+            ~Texture() {
+                glDeleteTextures(1, &ID);
+            }
+            Texture() = delete;
+            Texture(const Texture&) = delete;
+            Texture& operator=(const Texture&) = delete;
+            Texture& operator=(Texture&&) = delete;
         };
     }
 }

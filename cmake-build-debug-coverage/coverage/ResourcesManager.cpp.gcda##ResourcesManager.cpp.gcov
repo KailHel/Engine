@@ -1,0 +1,292 @@
+        -:    0:Source:/home/kail/Рабочий стол/Engine/support/ResourcesManager.cpp
+        -:    0:Graph:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/support/ResourcesManager.cpp.gcno
+        -:    0:Data:/home/kail/Рабочий стол/Engine/cmake-build-debug-coverage/CMakeFiles/OpenGL.dir/support/ResourcesManager.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// Created by kail on 27.12.2020.
+        -:    3://
+        -:    4:
+        -:    5:#include "ResourcesManager.h"
+        -:    6:
+        -:    7:#include "../graphics/Shader.h"
+        -:    8:#include "../graphics/Texture.h"
+        -:    9:
+        -:   10:#define STB_IMAGE_IMPLEMENTATION
+        -:   11:#include "../external_libraries//stbi/stb_image.h"
+        -:   12:
+        -:   13://################################################################################################################################
+        -:   14://---CallbackWindowProcedure
+    #####:   15:void defResizeWindowCallback(GLFWwindow* window ,int W ,int H)
+        -:   16:{
+    #####:   17:    ResourcesManager::WINDOW_W = W;
+    #####:   18:    ResourcesManager::WINDOW_H = H;
+    #####:   19:    glViewport(0,0,W,H);
+    %%%%%:   19-block  0
+    #####:   20:}
+    #####:   21:void defWindowKeyCallback(GLFWwindow* window ,int key ,int scan,int action,int mode)
+        -:   22:{
+    #####:   23:    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    %%%%%:   23-block  0
+    %%%%%:   23-block  1
+    #####:   24:        glfwSetWindowShouldClose(window,GLFW_TRUE);
+    %%%%%:   24-block  0
+        -:   25:    }
+    #####:   26:}
+        -:   27:
+        -:   28:
+        -:   29:
+        -:   30:
+        -:   31:
+        -:   32:
+        -:   33://################################################################################################################################
+        -:   34://---init static variables
+        -:   35:        //----------------------------------------------------------------------//
+        -:   36:
+        -:   37:
+        -:   38:        GLFWwindow* ResourcesManager::_MWindow                     =                nullptr;
+        -:   39:
+        -:   40:
+        -:   41:        //---//
+        -:   42:
+        -:   43:
+        -:   44:        int       ResourcesManager::WINDOW_W                       =                800;
+        -:   45:        int       ResourcesManager::WINDOW_H                       =                600;
+        -:   46:        string    ResourcesManager::WINDOW_TITLE                   =                "title";
+        -:   47:
+        -:   48:
+        -:   49:        //--//
+        -:   50:
+        -:   51:
+        -:   52:        ResourcesManager::_shMap ResourcesManager::_ShaderMap      =                _ShaderMapInit();
+        -:   53:        ResourcesManager::_stMap ResourcesManager::_TextureMap     =                _TextureMapInit();
+        -:   54:
+        -:   55:        string ResourcesManager::_defaultPath                      =                "";
+        -:   56:
+        -:   57:
+        -:   58:        //----------------------------------------------------------------------//
+        -:   59://------------------------------------------------------------------------------------------------------------------------------------------------//
+        -:   60://################################################################################################################################
+        1:   61:bool ResourcesManager::InitGLFW() {
+        1:   62:    if (!glfwInit()){
+        1:   62-block  0
+    #####:   63:        cerr << " ERROR : glfw init \n";
+    %%%%%:   63-block  0
+    #####:   64:        return false;
+        -:   65:    }
+        -:   66:
+        1:   67:    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,4);
+        1:   67-block  0
+        1:   68:    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,6);
+        1:   69:    glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
+        -:   70:    //glfwWindowHint(GLFW_RESIZABLE, 1);
+        -:   71:    //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+        -:   72:
+        1:   73:    _MWindow = glfwCreateWindow(WINDOW_W,WINDOW_H,WINDOW_TITLE.c_str(), nullptr, nullptr);
+        1:   74:    if (!_MWindow){
+    #####:   75:        cerr << " ERROR : glfwWindow init \n";
+    %%%%%:   75-block  0
+    #####:   76:        return false;
+        -:   77:    }
+        -:   78:
+        -:   79:
+        1:   80:    glfwMakeContextCurrent(_MWindow);
+        1:   80-block  0
+        1:   81:    glfwSetWindowSizeCallback(_MWindow,defResizeWindowCallback);
+        1:   82:    glfwSetKeyCallback(_MWindow,defWindowKeyCallback);
+        -:   83:
+        -:   84:
+        1:   85:    return true;
+        -:   86:}
+        -:   87://---
+        -:   88:
+        -:   89:
+        -:   90:
+        -:   91:
+        -:   92:
+        -:   93:
+        1:   94:bool ResourcesManager::InitGLAD() {
+        1:   95:    if(!gladLoadGL()){
+        1:   95-block  0
+    #####:   96:        cerr << " ERROR : glad init \n";
+    %%%%%:   96-block  0
+    #####:   97:        return false;
+        -:   98:    }
+        -:   99:
+        -:  100:
+        1:  101:    std::cout << "RENDERER   " << glGetString(GL_RENDERER) <<  "\n";
+        1:  101-block  0
+        1:  102:    std::cout << "VER OPENGL " << glGetString(GL_VERSION)  <<  "\n";
+        1:  103:    std::cout << "USE OpenGL " << GLVersion.major << "." << GLVersion.minor << "\n";
+        -:  104:
+        -:  105:
+        1:  106:    glEnable(GL_BLEND);
+        1:  107:    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        -:  108:
+        1:  109:    return true;
+        -:  110:}
+        -:  111://---
+        -:  112:
+        -:  113:
+        -:  114:
+    #####:  115:void ResourcesManager::Destroy() {
+    #####:  116:    if (_MWindow) glfwDestroyWindow(_MWindow);
+    %%%%%:  116-block  0
+    %%%%%:  116-block  1
+        -:  117:
+    #####:  118:    freeAllShader();
+    %%%%%:  118-block  0
+    #####:  119:    freeAllTexture();
+        -:  120:
+    #####:  121:    glfwTerminate();
+    #####:  122:}
+        -:  123:
+        -:  124:
+        -:  125://################################################################################################################################
+        -:  126://---SHADER---
+        1:  127:SK::Render::Shader* ResourcesManager::createShaderProgram(const string &VertexPath, const string &FragmentPath, const string &ShaderName) {
+        1:  128:    return _ShaderMap.emplace(ShaderName,new SK::Render::Shader(FileToString(VertexPath),FileToString(FragmentPath))).first->second;
+        1:  128-block  0
+        1:  128-block  1
+        1:  128-block  2
+        1:  128-block  3
+        1:  128-block  4
+        1:  128-block  5
+    $$$$$:  128-block  6
+    $$$$$:  128-block  7
+    $$$$$:  128-block  8
+    $$$$$:  128-block  9
+    $$$$$:  128-block 10
+        -:  129:}
+        -:  130:
+        -:  131:
+     1549:  132:SK::Render::Shader* ResourcesManager::getShaderByName(const string &ShaderName) {
+     1549:  133:    auto iter = _ShaderMap.find(ShaderName);
+     1549:  133-block  0
+     1549:  134:    if (iter == _ShaderMap.end()){
+     1549:  134-block  0
+    #####:  135:        cout << "WARNING :: getShaderByName :: ShaderList does not contain  -- " << ShaderName << "\n";
+    %%%%%:  135-block  0
+    %%%%%:  135-block  1
+    %%%%%:  135-block  2
+    #####:  136:        return nullptr;
+    %%%%%:  136-block  0
+        -:  137:    }
+     1549:  138:    return _ShaderMap.find(ShaderName)->second;
+     1549:  138-block  0
+     1549:  138-block  1
+        -:  139:}
+        -:  140:
+        -:  141:
+    #####:  142:bool ResourcesManager::freeShaderByName(const string &ShaderName) {
+    #####:  143:    auto iter =  _ShaderMap.find(ShaderName);
+    %%%%%:  143-block  0
+    #####:  144:    if (iter ==  _ShaderMap.end()){
+    %%%%%:  144-block  0
+    #####:  145:        cout << "WARNING :: freeShaderByName :: ShaderList does not contain  -- " << ShaderName << "\n";
+    %%%%%:  145-block  0
+    %%%%%:  145-block  1
+    %%%%%:  145-block  2
+    #####:  146:        return false;
+    %%%%%:  146-block  0
+        -:  147:    }
+    #####:  148:    if  (iter->second != nullptr) delete iter->second;
+    %%%%%:  148-block  0
+    %%%%%:  148-block  1
+    %%%%%:  148-block  2
+    #####:  149:    _ShaderMap.erase(ShaderName);
+    %%%%%:  149-block  0
+    #####:  150:    return true;
+    %%%%%:  150-block  0
+        -:  151:}
+        -:  152:
+    #####:  153:void ResourcesManager::freeAllShader() {
+    #####:  154:    for (auto iter : _ShaderMap){
+    %%%%%:  154-block  0
+    %%%%%:  154-block  1
+    %%%%%:  154-block  2
+    %%%%%:  154-block  3
+    #####:  155:        if  (iter.second != nullptr) delete iter.second;
+    %%%%%:  155-block  0
+    %%%%%:  155-block  1
+    %%%%%:  155-block  2
+        -:  156:    }
+    #####:  157:}
+    %%%%%:  157-block  0
+        -:  158:
+        -:  159://################################################################################################################################
+        -:  160://---TEXTURE---
+        1:  161:SK::Render::Texture*  ResourcesManager::createTexture(const string &ImagePath, const string &TextureName) {
+        1:  162:    stbi_set_flip_vertically_on_load(true);
+        1:  162-block  0
+        1:  163:    int channel = 0;
+        1:  164:    int width = 0;
+        1:  165:    int height = 0;
+        1:  166:    unsigned char* pixels = stbi_load(ImagePath.c_str(),&width,&height,&channel,0);
+        -:  167:
+        -:  168:
+        1:  169:    if(!pixels){
+        1:  169-block  0
+    #####:  170:        cout << "ERROR :: load image - " << ImagePath;
+    %%%%%:  170-block  0
+    %%%%%:  170-block  1
+        -:  171:    }
+        -:  172:
+        -:  173:
+        1:  174:    return _TextureMap.emplace(TextureName,new SK::Render::Texture(width,height,pixels,channel,GL_NEAREST,GL_CLAMP_TO_EDGE)).first->second;
+        1:  174-block  0
+        1:  174-block  1
+        1:  174-block  2
+        1:  174-block  3
+        1:  174-block  4
+    $$$$$:  174-block  5
+    $$$$$:  174-block  6
+        -:  175:}
+        -:  176:
+        -:  177:
+        -:  178:
+        1:  179:SK::Render::Texture* ResourcesManager::getTextureByName(const string & TextureName){
+        1:  180:    return _TextureMap.find(TextureName)->second;
+        1:  180-block  0
+        -:  181:}
+        -:  182:
+        -:  183:
+        -:  184:
+    #####:  185:bool ResourcesManager::freeTextureByName(const string &TextureName) {
+    #####:  186:    auto iter =  _TextureMap.find(TextureName);
+    %%%%%:  186-block  0
+    #####:  187:    if (iter ==  _TextureMap.end()){
+    %%%%%:  187-block  0
+    #####:  188:        cout << "WARNING :: freeTextureByName :: TextureList does not contain  -- " << TextureName << "\n";
+    %%%%%:  188-block  0
+    %%%%%:  188-block  1
+    %%%%%:  188-block  2
+    #####:  189:        return false;
+    %%%%%:  189-block  0
+        -:  190:    }
+        -:  191:
+    #####:  192:    if  (iter->second != nullptr) {
+    %%%%%:  192-block  0
+    #####:  193:        delete iter->second;
+    %%%%%:  193-block  0
+    %%%%%:  193-block  1
+        -:  194:    }
+    #####:  195:    _TextureMap.erase(TextureName);
+    %%%%%:  195-block  0
+    #####:  196:    return true;
+    %%%%%:  196-block  0
+        -:  197:}
+        -:  198:
+    #####:  199:void ResourcesManager::freeAllTexture() {
+    #####:  200:    for (auto iter : _TextureMap){
+    %%%%%:  200-block  0
+    %%%%%:  200-block  1
+    %%%%%:  200-block  2
+    %%%%%:  200-block  3
+    #####:  201:        if  (iter.second != nullptr) delete iter.second;
+    %%%%%:  201-block  0
+    %%%%%:  201-block  1
+    %%%%%:  201-block  2
+        -:  202:    }
+    #####:  203:}
+    %%%%%:  203-block  0
+        -:  204://------------------------------------------------------------------------------------------------------------------------------------------------//
