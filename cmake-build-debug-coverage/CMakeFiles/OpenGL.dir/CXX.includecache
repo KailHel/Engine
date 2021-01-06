@@ -1588,6 +1588,12 @@ string
 ../support/ResourcesManager.h
 /home/kail/Рабочий стол/Engine/support/ResourcesManager.h
 
+/home/kail/Рабочий стол/Engine/main.cpp
+string
+-
+game/Game.h
+/home/kail/Рабочий стол/Engine/game/Game.h
+
 /home/kail/Рабочий стол/Engine/support/ResourcesManager.h
 glad/glad.h
 /home/kail/Рабочий стол/Engine/support/glad/glad.h

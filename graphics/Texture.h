@@ -16,7 +16,7 @@ namespace SK {
         public:
             //################################################################################################################################
             Texture(const GLuint width, const GLuint height,
-                    const unsigned char *data,
+                    unsigned char *data,
                     const unsigned int channel = 4,
                     const GLenum filter = GL_LINEAR,
                     const GLenum wrapMode = GL_CLAMP_TO_EDGE) : _width(width), _height(height) {
@@ -40,8 +40,10 @@ namespace SK {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-
-                delete data;
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
+                glGenerateMipmap(GL_TEXTURE_2D);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                stbi_image_free(data);
             }
             //################################################################################################################################
             void bind() const {

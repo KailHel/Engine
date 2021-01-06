@@ -80,13 +80,14 @@ namespace SK {
 
                 glm::mat4 model(1.f);
                 model = glm::translate(model , _position);
-                //model = glm::translate(model, glm::vec3(0.5f * ResourcesManager::WINDOW_W , 0.5 * ResourcesManager::WINDOW_H ,0.f));
+               // model = glm::translate(model, glm::vec3(0.5f * 1 , 0.5 * 1 ,0.f));
                 model = glm::rotate(model , glm::radians(_angle),_rotation);
-                //model = glm::translate(model, glm::vec3(-0.5f * ResourcesManager::WINDOW_W , -0.5 * ResourcesManager::WINDOW_H ,0.f));
+                //model = glm::translate(model, glm::vec3(-0.5f * 1 , -0.5 * ResourcesManager::WINDOW_H ,0.f));
                 model = glm::scale(model,glm::vec3(_size,1.f));
+
                 _shader->setMatrix4("model",model);
 
-
+                glEnable(GL_SMOOTH);
                 glBindVertexArray(vao);
                 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
@@ -101,11 +102,12 @@ namespace SK {
             Texture* _texture;
 
 
-            glm::vec3   _position;
+
             glm::vec2   _size;
 
 
         public:
+            glm::vec3   _position;
             glm::vec3   _rotation;
             float       _angle;
             ~Sprite(){

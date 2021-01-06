@@ -42,7 +42,6 @@
             goto start;
             end:
             Dispose();
-            exit(0);
         }
 
 
