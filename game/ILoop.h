@@ -1,6 +1,7 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+
 #pragma once
 
 namespace SK {
@@ -54,8 +55,10 @@ namespace SK {
             }
 
             virtual int getFps() { return L_FPS; }
+
             virtual int getLag() { return L_LAG; }
-            virtual long double getDelta() {return _eqls;}
+
+            virtual long double getDelta() { return _eqls; }
             //------------------------------------------------
         private:
             long long _getNanoTime() {

@@ -6,138 +6,138 @@
 
 
 #include "Game.h"
+#include "../graphics/Render.h"
 
 
-void Game::Init()
-{
-    if (!ResourcesManager::InitGLFW()){ResourcesManager::Destroy();exit(404);}
-    if (!ResourcesManager::InitGLAD()){ResourcesManager::Destroy();exit(404);}
-    ResourcesManager::createShaderProgram(defaultVertexShaderPath, defaultFragmentShaderPath, defaultShaderName);
-    ResourcesManager::createTexture("res/44.png","def");
-    Events::initialize();
+typedef ResourcesManager _R;
+Camera *camera;
+SK::Render::Sprite *sprite;
+SK::Render::Shader *defShader;
+GLFWwindow *window;
 
-    window = ResourcesManager::getWindow();
+Mesh *mesh[1000];
 
 
-//    s[1] = new SK::Render::Sprite(defaultShaderName,"def",glm::vec3(0,0,-1),glm::vec2(1, 1));
-//    s[2] = new SK::Render::Sprite(defaultShaderName,"def",glm::vec3(1,0,0),glm::vec2(1, 1));
-//    s[3] = new SK::Render::Sprite(defaultShaderName,"def",glm::vec3(-1,0,0),glm::vec2(1, 1));
-//    s[2]->_rotation = vec3(0 ,1 ,0);s[2]->_angle = 90;
-//    s[3]->_rotation = vec3(0 ,1 ,0);s[3]->_angle = 90;
-//    s[4] = new SK::Render::Sprite(defaultShaderName,"def",glm::vec3(0,1,0),glm::vec2(1, 1));
-//    s[5] = new SK::Render::Sprite(defaultShaderName,"def",glm::vec3(0,-1,0),glm::vec2(1, 1));
-//    s[4]->_rotation = vec3(1 ,0 ,0);s[4]->_angle = 90;
-//    s[5]->_rotation = vec3(1 ,0 ,0);s[5]->_angle = 90;
-    //------------------------
+bool stopTime = false;
 
-    cam = new Camera(vec3(0,0,-30) , 90.f);
-    cam->position = glm::vec3(0,0,0);
-
-    glClearColor(0.6f,1.f,0.65f,1);
-    glEnable(GL_DEPTH_TEST);
-
-
-
-    sp =  new SK::Render::Sprite(defaultShaderName,"def",glm::vec3(0,0,0),glm::vec2(1, 1));
-
-    for (int i = 0; i <= 10; ++i) {
-        for (int j = 0; j <=10 ; ++j) {
-            mesh[i][j] = new Mesh(sp,  vec3(i+(i*1),0,j+(j*1)));
-        }
+void Game::Init() {
+    if (!ResourcesManager::InitGLFW()) {
+        ResourcesManager::Destroy();
+        exit(404);
     }
+    if (!ResourcesManager::InitGLAD()) {
+        ResourcesManager::Destroy();
+        exit(404);
+    }
+    Events::initialize();
+    window = _R::getWindow();
 
+    defShader =
+            _R::createShaderProgram("res/shader/vertex.glsl", "res/shader/fragment.glsl", "def");
+    _R::createTexture("res/texture/4.png", "1");
+    _R::createTexture("res/texture/44.png", "2");
+    sprite = new SK::Render::Sprite("def", "2", vec3(2, 0, 0), vec2(1000, 1000));
+    camera = new Camera(vec3(0, 0, 0), 90);
 
-    //------------------------
+    glClearColor(0.22f, 0.3f, 0.3f, 1);
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glEnable(GL_MULTISAMPLE);
 }
 
-void Game::Render()
-{
+void Game::Render() {
+    static float time = 1;
+    if (!stopTime)  time += 0.05f;
+
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    mat4 proj(1.f);
+    defShader->use();
+    defShader->setUniformMatrix4("projection", camera->getProjection());
+    defShader->setUniformMatrix4("view", camera->getView());
+    defShader->setUniformMatrix4("model",mat4(1.f));
+    defShader->setUniform1f("time",time);
+    double x,y;
+    glfwGetCursorPos(window,&x,&y);
+    defShader->setUniform2f("mouse" ,x,y);
+    defShader->setUniform2f("resolution" ,_R::WINDOW_W,_R::WINDOW_H);
 
-    //proj = glm::perspective(45.f , 800.f / 600.f , 0.1f ,100.f);
-    //view = translate(view , vec3(0,0,-3));
 
-    cam->rotate(0,0,0);
-
-
-    ResourcesManager::getShaderByName("DEF")->setMatrix4("view",cam->getView());
-    ResourcesManager::getShaderByName("DEF")->setMatrix4("projection",cam->getProjection());
-
-
-//    s[0]->render();
-//    s[1]->render();
-//    s[2]->render();
-//    s[3]->render();
-//    s[4]->render();
-//    s[5]->render();--leak-check=full --leak-resolution=med --track-origins=yes --vgdb=no
-
-    for (int i = 0; i <= 10; ++i) {
-        for (int j = 0; j <=10 ; ++j) {
-            mesh[i][j]->Draw();
-        }
-    }
+//    for (int i = 0; i < 50; ++i) {
+//        for (int j = 0; j < 50; ++j) {
+//            sprite->Draw();
+//            srand((time*10) / cos(i) * cos(j) + 3.4f / sin(time));
+//            sprite->_position = vec3(i*20 + sin(time) * 20, j*20 + rand() % 100, sin(rand() % 60) * cos(time) * 1000);
+//            sprite->_rotation = vec3(cos(time) * sin(rand()),cos(time) * 1000,tan(time) * 100);
+//            sprite->_angle = sin(time) * 10000;
+//        }
+//    }
+    //sprite->Draw();
 
     glfwSwapBuffers(window);
 }
 
-
-void Game::Update()
-{
+void Game::Update() {
+    //------------------------------------------------------------------------------------------------------------------
+    //---camera---
     static float camX = 0.0f;
     static float camY = 0.0f;
-
-    static float speed = 0.000000005f;
+    static float speed = 0.0000001f;
 
     Events::pullEvents();
-    if (Events::pressed(GLFW_KEY_ESCAPE) || glfwWindowShouldClose(ResourcesManager::getWindow()))
-        isRunning = false;
-    if (Events::pressed(GLFW_KEY_W)){
-        cam->position += cam->front  * speed * (float)(getDelta());
+    if (Events::pressed(GLFW_KEY_W)) {
+        camera->position += camera->front * speed * (float) (getDelta());
     }
-    if (Events::pressed(GLFW_KEY_S)){
-        cam->position -= cam->front * speed * (float)(getDelta());
+    if (Events::pressed(GLFW_KEY_S)) {
+        camera->position -= camera->front * speed * (float) (getDelta());
     }
-    if (Events::pressed(GLFW_KEY_D)){
-        cam->position += cam->right * speed * (float)(getDelta());
+    if (Events::pressed(GLFW_KEY_D)) {
+        camera->position += camera->right * speed * (float) (getDelta());
     }
-    if (Events::pressed(GLFW_KEY_A)){
-        cam->position -= cam->right * speed *  (float)(getDelta());
+    if (Events::pressed(GLFW_KEY_A)) {
+        camera->position -= camera->right * speed * (float) (getDelta());
     }
-    if (Events::pressed(GLFW_KEY_SPACE)){
-        cam->position +=cam->up * speed * (float)(getDelta());
+    if (Events::pressed(GLFW_KEY_SPACE)) {
+        camera->position += camera->up * speed * (float) (getDelta());
     }
-    if (Events::pressed(GLFW_KEY_LEFT_CONTROL)){
-        cam->position -= cam->up * speed * (float)(getDelta());
+    if (Events::pressed(GLFW_KEY_LEFT_CONTROL)) {
+        camera->position -= camera->up * speed * (float) (getDelta());
     }
     if (Events::clicked(GLFW_MOUSE_BUTTON_1)) Events::_cursor_locked = true;
     else Events::_cursor_locked = false;
 
 
-    if (Events::_cursor_locked){
+    if (Events::_cursor_locked) {
         camY += -Events::deltaY / 600 * 2;
         camX += -Events::deltaX / 600 * 2;
 
-        if (camY < -glm::radians(89.0f)){
+        if (camY < -glm::radians(89.0f)) {
             camY = -glm::radians(89.0f);
         }
-        if (camY > radians(89.0f)){
+        if (camY > radians(89.0f)) {
             camY = radians(89.0f);
         }
 
-        cam->rotation = mat4(1.0f);
-        cam->rotate(camY, camX, 0);
+        camera->rotation = mat4(1.0f);
+        camera->rotate(camY, camX, 0);
+    }
+    //------------------------------------------------------------------------------------------------------------------
+    //---Exit---
+    if (Events::pressed(GLFW_KEY_ESCAPE) || glfwWindowShouldClose(ResourcesManager::getWindow()))
+        isRunning = false;
+    //------------------------------------------------------------------------------------------------------------------
+
+    if (Events::pressed(GLFW_KEY_R)) {
+        stopTime = true;
+    } else {
+        stopTime = false;
+    }
+    if (Events::pressed(GLFW_KEY_LEFT_SHIFT)) {
+        float speed = 0.00005f;
+    } else {
+        float speed = 0.0000001f;
     }
 }
 
 
-void Game::Dispose()фф
-{
-    delete(cam);
-    for (int i = 0; i <= 10; ++i) {
-        for (int j = 0; j <=10 ; ++j) {
-            delete mesh[i][j];
-        }
-    }
-    delete(sp);
+void Game::Dispose() {
+
 }

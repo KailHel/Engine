@@ -14,7 +14,9 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "../support/Logger.h"
 
+#include "unordered_map"
 using std::string;
 using std::cout;
 
@@ -38,11 +40,14 @@ namespace SK {
                         GLsizei log_length = 0;
                         GLchar message[1024];
                         glGetShaderInfoLog(vertS, 1024, &log_length, message);
-                        cout << "ERROR :: compile vertex shader - " << message << "\n";\
-                    exit(3);
+                        string mes = "|Error ::Compile Vertex Shader|";
+                        mes + message + "|";
+                        Logger::LogData(mes);
+                        _isCompile = false;
+                        return;
                     }
                 }//---
-
+                Logger::CGL("Create vShader");
                 GLuint fragS = 0;
                 fragS = glCreateShader(GL_FRAGMENT_SHADER);
                 {
@@ -57,11 +62,14 @@ namespace SK {
                         GLsizei log_length = 0;
                         GLchar message[1024];
                         glGetShaderInfoLog(vertS, 1024, &log_length, message);
-                        cout << "ERROR :: compile fragment shader - " << message << "\n";\
-                    exit(3);
+                        string mes = "|Error ::Compile Fragment Shader |";
+                        mes + message + "|";
+                        Logger::LogData(mes);
+                        _isCompile = false;
+                        return;
                     }
                 }//---
-
+                Logger::CGL("Create fShader");
                 GLint ShaderProgram = 0;
                 ShaderProgram = glCreateProgram();
 
@@ -75,46 +83,64 @@ namespace SK {
                     GLsizei log_length = 0;
                     GLchar message[1024];
                     glGetProgramInfoLog(ShaderProgram, 1024, &log_length, message);
-                    cout << "ERROR :: compile shader program- " << message << "\n";\
-                exit(3);
+                    string mes = "|Error ::Compile Shader Program|";
+                    mes + message + "|";
+                    Logger::LogData(mes);
+                    _isCompile = false;
+                    return;
                 }
-
+                Logger::CGL("Create ShaderProgram");
                 glDeleteShader(vertS);
                 glDeleteShader(fragS);
 
                 ID = ShaderProgram;
                 _isCompile = true;
             }
+
             //################################################################################################################################
             void use() const {
                 glUseProgram(ID);
             }
             //################################################################################################################################
-            void setInt(const string &UniformName, const GLint value) {
-                glUniform1i(glGetUniformLocation(ID, UniformName.c_str()), value);
-            }
-            void setFloat1(const string &UniformName, const GLfloat value) {
-                glUniform1f(glGetUniformLocation(ID, UniformName.c_str()), value);
-            }
-            void setFloat2(const string &UniformName, const GLfloat value1 ,const GLfloat value2) {
-                glUniform2f(glGetUniformLocation(ID, UniformName.c_str()), value1,value2);
-            }
+            void setUniform1i(const string &UniformName, const GLint value1);
+
+            void setUniform21(const string &UniformName, const GLint value1, const GLint value2);
+
+            void setUniform3i(const string &UniformName, const GLint value1, const GLint value2, const GLint value3);
+
+            void setUniform1f(const string &UniformName, const GLfloat value1);
+
+            void setUniform2f(const string &UniformName, const GLfloat value1, const GLfloat value2);
+
+            void setUniform3f(const string &UniformName, const GLfloat value1, const GLfloat value2, const GLfloat value3);
+
+            void setUniform2f(const string &UniformName, glm::vec2 &value);
+
+            void setUniform3f(const string &UniformName, glm::vec3 &value);
+
+            void setUniformMatrix4(const string &UniformName, const glm::mat4 &value);
+
+            const GLuint getUniformLocation(const string &UniformName);
+
+
             //################################################################################################################################
-            void setMatrix4(const std::string &UniformName, const glm::mat4 matrix) {
-                glUniformMatrix4fv(glGetUniformLocation(ID, UniformName.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
-            }
-            //################################################################################################################################
-            const GLuint getID(){return ID;}
+            const GLuint getLocation() { return ID; }
             //################################################################################################################################
         private:
             GLuint ID;
             bool _isCompile = false;
+
+            std::unordered_map<string , GLuint> _UniformMap;
         public:
             ~Shader() { glDeleteProgram(ID); }
+
             Shader() = delete;
-            Shader(const ResourcesManager&) = delete;
-            Shader& operator=(const Shader&) = delete;
-            Shader& operator=(Shader&&) = delete;
+
+            Shader(const ResourcesManager &) = delete;
+
+            Shader &operator=(const Shader &) = delete;
+
+            Shader &operator=(Shader &&) = delete;
         };
     }
 }

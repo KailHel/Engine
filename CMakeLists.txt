@@ -4,7 +4,6 @@
                                                         cmake_minimum_required(VERSION 3.13)
                                                                 project(OpenGL)
 
-
                                                         add_executable(OpenGL main.cpp
                                            external_libraries/stbi/stb_image.h
                                            support/ResourcesManager.cpp support/ResourcesManager.h
@@ -16,8 +15,13 @@
                                            game/Game.h
                                            graphics/Camera.h
                                            graphics/Camera.cpp
-                                                                game/Events.cpp
-                                                                game/Events.h)
+                                           game/Events.cpp
+                                           game/Events.h support/Logger.cpp
+                                           support/Logger.h
+                                           graphics/Render.cpp
+                                           graphics/Render.h
+                                           graphics/Mesh.cpp
+                                           graphics/Mesh.h graphics/Shader.cpp)
 #----------------------------------------------------------------GLFW COMPILE OPTION--------------------------------------------------------------#
                                             set(GLFW_BUILD_EXAMPLES OFF     CACHE BOOL      "" FORCE)
                                             set(GLFW_BUILD_TESTS    OFF     CACHE BOOL      "" FORCE)

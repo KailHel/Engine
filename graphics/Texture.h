@@ -10,6 +10,7 @@
 #include "../external_libraries/stbi//stb_image.h"
 
 #include "../support//ResourcesManager.h"
+#include "../support/Logger.h"
 namespace SK {
     namespace Render {
         class Texture {
@@ -35,13 +36,14 @@ namespace SK {
                 glGenTextures(1, &ID);
                 glBindTexture(GL_TEXTURE_2D, ID);
                 glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode, GL_UNSIGNED_BYTE, data);
-
+                Logger::CGL("Texture set data");
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
                 glGenerateMipmap(GL_TEXTURE_2D);
+                Logger::CGL("Texture error");
                 glBindTexture(GL_TEXTURE_2D, 0);
                 stbi_image_free(data);
             }
